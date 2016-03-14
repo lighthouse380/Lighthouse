@@ -5,12 +5,6 @@
 	</head>
 	<body>
 	
-	
-	<%@ taglib uri="http://bootstrapjsp.org/" prefix="b" %>
-	<b:kickstart title="My First Page">
-	    <b:button mold="ok"/>
-	</b:kickstart>
-	
 		<c:choose>
 			<c:when test="${user != null}">
 				<p>
