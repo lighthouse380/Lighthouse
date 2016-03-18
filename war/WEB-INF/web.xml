@@ -6,7 +6,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	<servlet>
 		<servlet-name>Clock</servlet-name>
-		<servlet-class>clock.ClockServlet</servlet-class>
+		<servlet-class>servlets.ClockServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>Clock</servlet-name>
@@ -18,7 +18,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	
 	<servlet>
 		<servlet-name>Prefs</servlet-name>
-		<servlet-class>clock.PrefsServlet</servlet-class>
+		<servlet-class>servlets.PrefsServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>Prefs</servlet-name>
