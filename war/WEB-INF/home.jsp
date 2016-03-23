@@ -42,7 +42,7 @@
 		
 		<c:if test="${user != null}">
 
-			<form action="/search" method="post">
+			<form action="/" method="get">
 				<label for="movie_title">
 					Search Movie Title:
 				</label>
