@@ -46,10 +46,15 @@ import com.google.gson.JsonParser;
 @SuppressWarnings("serial")
 public class SearchServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-		java.lang.System.out.println("doPost called");
 
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
+		String loginUrl = userService.createLoginURL("/");
+		String logoutUrl = userService.createLogoutURL("/");
+		
+		req.setAttribute("user", user);
+		req.setAttribute("loginUrl", loginUrl);
+		req.setAttribute("logoutUrl", logoutUrl);
 		
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		Key userKey = KeyFactory.createKey("UserPrefs", user.getUserId());
@@ -78,6 +83,9 @@ public class SearchServlet extends HttpServlet {
 		}
 		
 		req.setAttribute("searchResults", searchResults);
+		
+		resp.setContentType("text/html");
+		
 		RequestDispatcher jsp = req.getRequestDispatcher("/WEB-INF/home.jsp");
 		jsp.forward(req, resp);
 	}
@@ -108,7 +116,7 @@ public class SearchServlet extends HttpServlet {
 	                Date releaseDate = this.parseDate(dateString, "yyyy-MM-dd");
 	                		
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate);
-	             
+
 	                movieList.add(movie);
 	            }
 	        }

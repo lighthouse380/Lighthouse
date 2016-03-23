@@ -49,7 +49,7 @@
 				<input name="movie_title" id="movie_title" type="text" size="10" value="${movie_title}" />
 				<input type="submit" value="Search"/>
 			</form>
-
+			
 			<p>
 			<table border="1">
 			  <tr>
@@ -59,8 +59,8 @@
 			  </tr>
 			  <c:forEach items="${searchResults}" var="movie">
 			    <tr>
-			      <td>${movie.title}</td>
-			      <td>${movie.releaseDate}</td>
+			      <td>${fn:escapeXml(movie.title)}</td>
+			      <td>${fn:escapeXml(movie.releaseDate)}</td>
 			    </tr>
 			  </c:forEach>
 			</p>

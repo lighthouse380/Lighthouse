@@ -93,7 +93,7 @@ public class LighthouseServlet extends HttpServlet {
 		
 		resp.setContentType("text/html");
 		
-		RequestDispatcher jsp = req.getRequestDispatcher("/");
+		RequestDispatcher jsp = req.getRequestDispatcher("/WEB-INF/home.jsp");
 		jsp.forward(req, resp);
 		
 	}
