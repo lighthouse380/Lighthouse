@@ -26,11 +26,12 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 @SuppressWarnings("serial")
-public class ClockServlet extends HttpServlet {
+public class LighthouseServlet extends HttpServlet {
 	//logger for the memcache check (optional)
-	private static final Logger log = Logger.getLogger(ClockServlet.class.getName());
+	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+		System.out.println("Test");
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
 		

@@ -18,11 +18,11 @@ public class DatabaseHandler {
 		boolean haveMovie = false;
         System.out.println("Connecting to database...");
 
-        try (java.sql.Connection connection = DriverManager.getConnection(url, username, password)) {
-            System.out.println("Database connected.");
-        } catch (SQLException e) {
-            throw new IllegalStateException("Cannot connect to database.", e);
-        }
+//        try (java.sql.Connection connection = DriverManager.getConnection(url, username, password)) {
+//        	System.out.println("Database connected.");
+//        } catch (SQLException e) {
+//            throw new IllegalStateException("Cannot connect to database.", e);
+//        }
 		return haveMovie;
 	}
 	

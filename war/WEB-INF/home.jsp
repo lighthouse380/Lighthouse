@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 	<head>
-		<title>The Time Is...</title>
+		<title>Lighthouse</title>
 	</head>
 	<body>
 	
@@ -22,7 +22,7 @@
 		<p>The time is: ${currentTime}</p>
 		
 		<c:if test="${user != null}">
-			<form action="/prefs" method="post">
+			<form action="/search" method="post">
 				<label for="tz_offset">
 					Timezone offset from UTC (can be negative):
 				</label>
