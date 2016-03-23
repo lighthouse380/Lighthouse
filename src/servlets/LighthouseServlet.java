@@ -94,14 +94,15 @@ public class LighthouseServlet extends HttpServlet {
 			}
 			
 			
-		 				
-			movieTitle = uriEncode(movieTitle);
-			try {
-				searchResults = this.getMoviesInfo(movieTitle);
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		 	if (movieTitle != null && movieTitle != ""){		
+				movieTitle = uriEncode(movieTitle);
+				try {
+					searchResults = this.getMoviesInfo(movieTitle);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		 	}
 			
 		}
 
@@ -122,7 +123,7 @@ public class LighthouseServlet extends HttpServlet {
 	    	String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=" + title;
 	        String json = IOUtils.toString(new URL(url));
 	        JsonParser parser = new JsonParser();
-	        
+
 	        // The JsonElement is the root node. It can be an object, array, null or
 	        // java primitive.
 	        JsonElement element = parser.parse(json);
@@ -137,12 +138,17 @@ public class LighthouseServlet extends HttpServlet {
 	            for (int i = 0; i < datasets.size(); i++) {
 	                JsonObject dataset = datasets.get(i).getAsJsonObject();
 	                String dateString = dataset.get("release_date").getAsString();
+	                Date releaseDate;
+	                if (!dateString.isEmpty())
+	                	releaseDate = this.parseDate(dateString, "yyyy-MM-dd");
+	                else
+	                	releaseDate = this.parseDate("000-00-00", "yyyy-MM-dd"); //no date found
 	                
-	                Date releaseDate = this.parseDate(dateString, "yyyy-MM-dd");
-	                		
+	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate);
 
 	                movieList.add(movie);
+	                System.out.println("Movie # " + i);
 	            }
 	        }
 	        
