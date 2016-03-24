@@ -138,17 +138,23 @@ public class LighthouseServlet extends HttpServlet {
 	            for (int i = 0; i < datasets.size(); i++) {
 	                JsonObject dataset = datasets.get(i).getAsJsonObject();
 	                String dateString = dataset.get("release_date").getAsString();
+	                String imgUrl;
 	                Date releaseDate;
 	                if (!dateString.isEmpty())
 	                	releaseDate = this.parseDate(dateString, "yyyy-MM-dd");
 	                else
 	                	releaseDate = this.parseDate("000-00-00", "yyyy-MM-dd"); //no date found
+	                if (!dataset.get("poster_path").isJsonNull()){
+	                	imgUrl = dataset.get("poster_path").getAsString();
+	                	imgUrl = "http://image.tmdb.org/t/p/w500/" + imgUrl;
+	                }
+	                else
+	                	imgUrl = ""; //no img found
 	                
 	                
-	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate);
+	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
 
 	                movieList.add(movie);
-	                System.out.println("Movie # " + i);
 	            }
 	        }
 	        

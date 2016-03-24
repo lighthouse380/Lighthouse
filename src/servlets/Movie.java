@@ -5,6 +5,28 @@ import java.util.Date;
 
 public class Movie {
 	
+	
+	String title;
+	String imgUrl;
+	Date releaseDate;
+	
+	Movie(String title, Date releaseDate, String imgUrl) {
+		this.title = title;
+		this.releaseDate = releaseDate;
+		this.imgUrl = imgUrl;
+	}
+	
+	
+	void subscribe(String userID) {
+		DatabaseHandler dh = new DatabaseHandler();
+		dh.addSubscription(this, userID);
+	}
+	
+	void unsubscribe(String userID) {
+		DatabaseHandler dh = new DatabaseHandler();
+		dh.removeSubscription(this, userID);
+	}
+	
 	public String getTitle() {
 		return title;
 	}
@@ -21,23 +43,14 @@ public class Movie {
 		this.releaseDate = releaseDate;
 	}
 
-	String title;
-	Date releaseDate;
-	
-	Movie(String title, Date releaseDate) {
-		this.title = title;
-		this.releaseDate = releaseDate;
+	public String getImgUrl() {
+		return imgUrl;
 	}
-	
-	void subscribe(String userID) {
-		DatabaseHandler dh = new DatabaseHandler();
-		dh.addSubscription(this, userID);
+
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
 	}
-	
-	void unsubscribe(String userID) {
-		DatabaseHandler dh = new DatabaseHandler();
-		dh.removeSubscription(this, userID);
-	}
+
 	
 
 }

@@ -53,12 +53,14 @@
 			<p>
 			<table border="1">
 			  <tr>
-			    <th>  Movie  </th>
+			    <th>  Movie  Cover </th>
+			    <th>  Movie  Title </th>
 			    <th>  Release Date  </th>
 			    <th>  Subscribe  </th>
 			  </tr>
 			  <c:forEach items="${searchResults}" var="movie">
 			    <tr>
+			      <td><img src="${movie.imgUrl}" style="width:200px;"></td>
 			      <td>${movie.title}</td>
 			      <td>${movie.releaseDate}</td>
 			    </tr>
