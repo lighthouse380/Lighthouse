@@ -9,6 +9,7 @@ public class Movie {
 	String title;
 	String imgUrl;
 	Date releaseDate;
+	Boolean subscribed; 
 	
 	Movie(String title, Date releaseDate, String imgUrl) {
 		this.title = title;
@@ -49,6 +50,16 @@ public class Movie {
 
 	public void setImgUrl(String imgUrl) {
 		this.imgUrl = imgUrl;
+	}
+
+
+	public Boolean getSubscribed() {
+		return subscribed;
+	}
+
+
+	public void setSubscribed(Boolean subscribed) {
+		this.subscribed = subscribed;
 	}
 
 	

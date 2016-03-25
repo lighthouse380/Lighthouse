@@ -109,14 +109,43 @@
 	                <h3>
 	                	<fmt:formatDate type="date" value="${movie.releaseDate}" />
 	                </h3>
-	                <h3>
-	                <a href="#">Remind Me!</a>
-	                </h3>
+	                
+	                
+	                
+	      <!--  if release date is after current date -->
+	         <jsp:useBean id="now" class="java.util.Date"/>
+		         <c:choose>
+					<c:when test="${movie.releaseDate gt now}">
+						<c:choose>
+							<c:when test="${not movie.subscribed}">
+				                <h3>
+				                <form action="/" method="post">
+				                	<input type="hidden" name="title" value="${movie.title}" />
+				                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
+				                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+								    <button type="submit" value="Submit">Subscribe</button>
+								</form>
+				                </h3>
+				            </c:when>
+				            <c:otherwise>
+				            	<h3>
+				                <a href="#">Unsubscribe</a>
+				                </h3>
+				            </c:otherwise>
+				        </c:choose>
+			         </c:when>
+			         <c:otherwise>
+			         	<h3>
+			         	Already Released!
+		                </h3>
+			         </c:otherwise>
+			     </c:choose>
 	            </div>
 	        <c:if test="${loop.last or (loop.index + 1) % 3 == 0}"> 
 	        </div>
-	        <!-- /.row -->
+	        <!-- /.end row -->
 	        </c:if>
+	        
 	</c:forEach>
         
         <hr>

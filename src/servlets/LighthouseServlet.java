@@ -97,7 +97,7 @@ public class LighthouseServlet extends HttpServlet {
 		 	if (movieTitle != null && movieTitle != ""){		
 				movieTitle = uriEncode(movieTitle);
 				try {
-					searchResults = this.getMoviesInfo(movieTitle);
+					searchResults = this.getMoviesInfo(movieTitle, user);
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -117,7 +117,29 @@ public class LighthouseServlet extends HttpServlet {
 		
 	}
 	
-	 private ArrayList<Movie> getMoviesInfo(String title) throws MalformedURLException, IOException, ParseException{
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		String userEmail = user.getEmail();
+		
+		String movieTitle = req.getParameter("title");
+		String movieImg = req.getParameter("imgUrl");
+		
+		Date movieDate = null;
+		try {
+			movieDate = this.parseDate(req.getParameter("releaseDate"), "yyyy-MM-dd");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Movie movie = new Movie(movieTitle, movieDate, movieImg);
+		DatabaseHandler.addSubscription(movie, userEmail);
+		
+		resp.sendRedirect("/");
+	}
+	
+	 private ArrayList<Movie> getMoviesInfo(String title, User user) throws MalformedURLException, IOException, ParseException{
 		 	ArrayList<Movie> movieList = new ArrayList<Movie>();
 		 	
 	    	String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=" + title;
@@ -140,10 +162,12 @@ public class LighthouseServlet extends HttpServlet {
 	                String dateString = dataset.get("release_date").getAsString();
 	                String imgUrl;
 	                Date releaseDate;
+	                
 	                if (!dateString.isEmpty())
 	                	releaseDate = this.parseDate(dateString, "yyyy-MM-dd");
 	                else
 	                	releaseDate = this.parseDate("000-00-00", "yyyy-MM-dd"); //no date found
+	                
 	                if (!dataset.get("poster_path").isJsonNull()){
 	                	imgUrl = dataset.get("poster_path").getAsString();
 	                	imgUrl = "http://image.tmdb.org/t/p/w500/" + imgUrl;
@@ -151,8 +175,13 @@ public class LighthouseServlet extends HttpServlet {
 	                else
 	                	imgUrl = "https://placehold.it/200x300?text=Movie"; //no img found
 	                
-	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
+
+	                if (DatabaseHandler.checkSubscription(movie, user))
+	                	movie.subscribed = true;
+	                else
+	                	movie.subscribed = false;
+	                
 
 	                movieList.add(movie);
 	            }

@@ -24,25 +24,27 @@ public class DatabaseHandler {
     	
     }
     
+    public static boolean checkSubscription(Movie movie, String userEmail){
+    	return false;
+    }
     
-    
-	void addMovie(Movie movie) {
+	static void addMovie(Movie movie) {
 		
 	}
 	
-	boolean checkMovie(Movie movie) {
+	static boolean checkMovie(Movie movie) {
 		boolean haveMovie = false;
 
 		return haveMovie;
 	}
 	
 	
-	void addSubscription(Movie movie, String userID) {	
+	public static boolean addSubscription(Movie movie, String userEmail) {	
 		if (!checkMovie(movie)) {
 			addMovie(movie);
 		}
 		
-		
+		return true;
 	}
 	
 
