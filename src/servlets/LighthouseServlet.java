@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,6 +76,13 @@ public class LighthouseServlet extends HttpServlet {
 			
 			String cacheKey = "UserPrefs:" + user.getUserId();
 			userPrefs = (Entity)memcache.get(cacheKey);
+			
+			DatabaseHandler dh = new DatabaseHandler();
+			try {
+				dh.addUser(user.getEmail());
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 
 			//LOGGING MEMCACHE (OPTIONAL)
 			if(userPrefs == null){
