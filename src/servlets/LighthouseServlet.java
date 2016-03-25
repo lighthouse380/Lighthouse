@@ -177,7 +177,7 @@ public class LighthouseServlet extends HttpServlet {
 	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
 
-	                if (DatabaseHandler.checkSubscription(movie, user))
+	                if (DatabaseHandler.checkSubscription(movie, user.getEmail()))
 	                	movie.subscribed = true;
 	                else
 	                	movie.subscribed = false;
