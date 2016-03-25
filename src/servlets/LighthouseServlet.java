@@ -149,7 +149,7 @@ public class LighthouseServlet extends HttpServlet {
 	                	imgUrl = "http://image.tmdb.org/t/p/w500/" + imgUrl;
 	                }
 	                else
-	                	imgUrl = ""; //no img found
+	                	imgUrl = "https://placehold.it/200x300?text=Movie"; //no img found
 	                
 	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
