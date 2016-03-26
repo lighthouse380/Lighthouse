@@ -38,20 +38,22 @@ public class DatabaseHandler {
 	static void addMovie(Movie movie) {
 	}
 
-
-	static boolean checkMovie(Movie movie) {
-		boolean haveMovie = false;
-
-		return haveMovie;
-	}
 	
 	
-	public static boolean addSubscription(Movie movie, String userEmail) {	
-		if (!checkMovie(movie)) {
-			addMovie(movie);
-		}
-		
-		return true;
+	public static void addSubscription(Movie movie, String userEmail) {	
+    	System.out.println("Connecting to database...");
+	    try (Connection conn = DriverManager.getConnection(url, username, password)) {		    	
+	    	System.out.println("Database connected.");
+	        PreparedStatement statement = conn.prepareStatement("call sp_add_subscription('" + userEmail 
+	        		+ "', '" + movie.getTitle() + "', '" + movie.getReleaseDate().toString() + ");");
+	        ResultSet rs = statement.executeQuery();
+	        rs = statement.executeQuery("SELECT * from Subscription");
+		    while (rs.next()) {
+		    	System.out.println(rs.getString("movie_id"));
+		    }
+	    } catch (SQLException e) {
+	        throw new IllegalStateException("Cannot connect to database.", e);
+	    }
 	}
 	
 
