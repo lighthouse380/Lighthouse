@@ -119,12 +119,21 @@
 						<c:choose>
 							<c:when test="${not movie.subscribed}">
 				                <h3>
-				                <form action="/" method="post">
-				                	<input type="hidden" name="title" value="${movie.title}" />
-				                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
-				                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
-								    <button type="submit" value="Submit">Subscribe</button>
-								</form>
+				                <c:choose>
+					                <c:when test="${user != null}">
+						                <form action="/" method="post">
+						                	<input type="hidden" name="title" value="${movie.title}" />
+						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
+						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+										    <button type="submit" value="Submit">Subscribe</button>
+										</form>
+									</c:when>
+									<c:otherwise>
+										<form action="${loginUrl}">
+										    <input type="submit" value="Subscribe">
+										</form>
+									</c:otherwise>
+								</c:choose>
 				                </h3>
 				            </c:when>
 				            <c:otherwise>

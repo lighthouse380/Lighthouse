@@ -14,7 +14,7 @@ public class DatabaseHandler {
 	static String password = "password";
     
     
-    public static void addUser(String userEmail) throws SQLException {
+    public void addUser(String userEmail) throws SQLException {
     	System.out.println("Connecting to database...");
 	    try (Connection conn = DriverManager.getConnection(url, username, password)) {		    	
 	    	System.out.println("Database connected.");

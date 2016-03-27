@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SimpleTimeZone;
-import java.util.logging.*;
 
 import org.apache.commons.io.IOUtils;
 
@@ -24,14 +23,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -44,7 +35,6 @@ import com.google.gson.JsonParser;
 @SuppressWarnings("serial")
 public class LighthouseServlet extends HttpServlet {
 	//logger for the memcache check (optional)
-	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
@@ -67,15 +57,7 @@ public class LighthouseServlet extends HttpServlet {
 		/*if (req.getAttribute("searchResults") == null){
 			req.setAttribute("searchResults", null);
 		}*/
-		
-		Entity userPrefs = null;
-		//Get user from Memcache, if not there get from Datastore and store in memcache for faster retrieval
-		if(user != null){
-			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-			MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
 			
-			String cacheKey = "UserPrefs:" + user.getUserId();
-			userPrefs = (Entity)memcache.get(cacheKey);
 			
 			DatabaseHandler dh = new DatabaseHandler();
 			try {
@@ -83,36 +65,16 @@ public class LighthouseServlet extends HttpServlet {
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
-
-			//LOGGING MEMCACHE (OPTIONAL)
-			if(userPrefs == null){
-				log.warning("CACHE MISS");
-			} else {
-				log.warning("CACHE HIT! :D");
+			
+		
+	 	if (movieTitle != null && movieTitle != ""){		
+			movieTitle = uriEncode(movieTitle);
+			try {
+				searchResults = this.getMoviesInfo(movieTitle, user);
+			} catch (ParseException e) {
+				e.printStackTrace();
 			}
-			
-			if(userPrefs == null){	
-				Key userKey = KeyFactory.createKey("UserPrefs", user.getUserId());
-				try{
-					userPrefs = ds.get(userKey);
-					memcache.put(cacheKey, userPrefs);
-				} catch (EntityNotFoundException e){
-					//no user prefs stored
-				}
-			}
-			
-			
-		 	if (movieTitle != null && movieTitle != ""){		
-				movieTitle = uriEncode(movieTitle);
-				try {
-					searchResults = this.getMoviesInfo(movieTitle, user);
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		 	}
-			
-		}
+	 	}
 
 		
 		req.setAttribute("searchResults", searchResults);
@@ -185,7 +147,7 @@ public class LighthouseServlet extends HttpServlet {
 	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
 
-	                if (DatabaseHandler.checkSubscription(movie, user.getEmail()))
+	                if (user != null && DatabaseHandler.checkSubscription(movie, user.getEmail()))
 	                	movie.subscribed = true;
 	                else
 	                	movie.subscribed = false;
