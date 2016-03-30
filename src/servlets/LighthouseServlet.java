@@ -77,9 +77,8 @@ public class LighthouseServlet extends HttpServlet {
 			String cacheKey = "UserPrefs:" + user.getUserId();
 			userPrefs = (Entity)memcache.get(cacheKey);
 			
-			DatabaseHandler dh = new DatabaseHandler();
 			try {
-				dh.addUser(user.getEmail());
+				DatabaseHandler.addUser(user.getEmail());
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
