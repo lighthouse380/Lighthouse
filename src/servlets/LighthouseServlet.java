@@ -58,13 +58,13 @@ public class LighthouseServlet extends HttpServlet {
 			req.setAttribute("searchResults", null);
 		}*/
 			
-			
+			/*
 			DatabaseHandler dh = new DatabaseHandler();
 			try {
 				dh.addUser(user.getEmail());
 			} catch (SQLException e1) {
 				e1.printStackTrace();
-			}
+			}*/
 			
 		
 	 	if (movieTitle != null && movieTitle != ""){		
