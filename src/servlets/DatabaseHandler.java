@@ -16,15 +16,10 @@ public class DatabaseHandler {
 	static String username = "root";
 	static String password = "password";
     
-<<<<<<< HEAD
 	
 	
 	
 	public static void printUsers() {
-=======
-    
-    public void addUser(String userEmail) throws SQLException {
->>>>>>> branch 'master' of https://github.com/lighthouse380/Lighthouse
     	System.out.println("Connecting to database...");
     	ResultSet rs = null;
     	Connection conn = null;

@@ -65,7 +65,7 @@ public class LighthouseServlet extends HttpServlet {
 			movieTitle = uriEncode(movieTitle);
 			try {
 				searchResults = this.getMoviesInfo(movieTitle, user);
-			} catch (ParseException e) {
+			} catch (ParseException | SQLException e) {
 				e.printStackTrace();
 			}
 		}
