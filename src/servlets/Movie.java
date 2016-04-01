@@ -24,7 +24,7 @@ public class Movie {
 	
 	void unsubscribe(String userID) {
 		DatabaseHandler dh = new DatabaseHandler();
-		dh.removeSubscription(this, userID);
+		dh.deleteSubscription(this, userID);
 	}
 	
 	public String getTitle() {

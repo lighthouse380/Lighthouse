@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SimpleTimeZone;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
@@ -34,9 +35,13 @@ import com.google.gson.JsonParser;
 
 @SuppressWarnings("serial")
 public class LighthouseServlet extends HttpServlet {
-	//logger for the memcache check (optional)
+	
+	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+		
+		log.warning("Hello from LighthouseServlet");
+		
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
 		
@@ -55,8 +60,9 @@ public class LighthouseServlet extends HttpServlet {
 		req.setAttribute("logoutUrl", logoutUrl);
 		
 			
-			
-			DatabaseHandler.addUser(user.getEmail());
+			if (user != null) {
+				//DatabaseHandler.addUser(user.getEmail());				
+			}
 //			DatabaseHandler.printUsers();
 
 			
@@ -99,7 +105,7 @@ public class LighthouseServlet extends HttpServlet {
 		}
 
 		Movie movie = new Movie(movieTitle, movieDate, movieImg);
-		DatabaseHandler.addSubscription(movie, userEmail);
+//		DatabaseHandler.addSubscription(movie, userEmail);
 		
 		resp.sendRedirect("/");
 	}
@@ -142,10 +148,10 @@ public class LighthouseServlet extends HttpServlet {
 	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
 
-	                if (user != null && DatabaseHandler.checkSubscription(movie, user.getEmail()))
-	                	movie.subscribed = true;
-	                else
-	                	movie.subscribed = false;
+//	                if (user != null && DatabaseHandler.checkSubscription(movie, user.getEmail()))
+//	                	movie.subscribed = true;
+//	                else
+//	                	movie.subscribed = false;
 	                
 
 	                movieList.add(movie);

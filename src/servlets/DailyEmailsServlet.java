@@ -1,7 +1,7 @@
 package servlets;
 
 
-public class DailyEmails {
+public class DailyEmailsServlet {
     
     public static void sendDailyEmails()  {
 

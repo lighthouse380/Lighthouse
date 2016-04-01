@@ -17,8 +17,6 @@ public class DatabaseHandler {
 	static String password = "password";
     
 	
-	
-	
 	public static void printUsers() {
     	System.out.println("Connecting to database...");
     	ResultSet rs = null;
@@ -113,13 +111,13 @@ public class DatabaseHandler {
 	}
 	
 
-	void removeSubscription(Movie movie, String userEmail) {
+	void deleteSubscription(Movie movie, String userEmail) {
 		// TODO Stored procedure does not exist in the database yet.
     	System.out.println("Connecting to database...");
 	    try (Connection conn = DriverManager.getConnection(url, username, password)) {		    	
 	    	System.out.println("Database connected.");
 	    	String convertedDate = convertDate(movie.getReleaseDate());
-	        PreparedStatement statement = conn.prepareStatement("call sp_remove_subscription(?, ?, ?);");
+	        PreparedStatement statement = conn.prepareStatement("call sp_delete_subscription(?, ?, ?);");
 	        statement.setString(1, userEmail);
 	        statement.setString(2, movie.getTitle());
 	        statement.setString(3, convertedDate);   
