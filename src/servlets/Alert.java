@@ -1,25 +1,32 @@
 package servlets;
 
 import java.util.ArrayList;
+import java.util.Date;
 
-// Alert will be used by other classes 
+// Used by DailyEmails and DatabaseHandler.
 
 public class Alert {
 
-	private String movieID;
-	private ArrayList<String> accountID;
+	private String title;
+	private Date releaseDate;
+	private ArrayList<String> emailAddresses;
 
-	public Alert(String movieID, ArrayList<String> accountID) {
-		this.movieID = movieID;
-		this.accountID = accountID;
+	public Alert(String title, ArrayList<String> emailAddresses, Date releaseDate) {
+		this.title = title;
+		this.emailAddresses = emailAddresses;
+		this.releaseDate = releaseDate;
 	}
 
-	public String getMovieID() {
-		return movieID;
+	public String getTitle() {
+		return title;
 	}
 
-	public ArrayList<String> getAccountID() {
-		return accountID;
+	public ArrayList<String> getEmailAddresses() {
+		return emailAddresses;
+	}
+	
+	public Date getReleaseDate() {
+		return releaseDate;
 	}
 
 }

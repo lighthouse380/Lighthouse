@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -33,11 +34,7 @@ public class DatabaseHandler {
 			}
 	    } catch (SQLException e) {
 	        throw new IllegalStateException("Cannot connect to database.", e);
-	    } finally {
-	        try { statement.close(); } catch (Exception e) { /* ignored */ }
-	        try { conn.close(); } catch (Exception e) { /* ignored */ }
-	        try { rs.close(); } catch (Exception e) { /* ignored */ }
-	    }
+	    } 
 	}
     
     public static void addUser(String userEmail)  {
@@ -53,11 +50,7 @@ public class DatabaseHandler {
 	        rs = statement.executeQuery();
 	    } catch (SQLException e) {
 	        throw new IllegalStateException("Cannot connect to database.", e);
-	    } finally {
-	        try { statement.close(); } catch (Exception e) { /* ignored */ }
-	        try { conn.close(); } catch (Exception e) { /* ignored */ }
-	        try { rs.close(); } catch (Exception e) { /* ignored */ }
-	    }
+	    } 
     }
     
     private static String convertDate(Date javaDate) {
@@ -75,9 +68,9 @@ public class DatabaseHandler {
 	    try {
 	    	conn = DriverManager.getConnection(url, username, password);
 	    	System.out.println("Database connected.");
-	    	System.out.println("Java date:" + movie.getReleaseDate());
+//	    	System.out.println("Java date:" + movie.getReleaseDate());
 	    	String convertedDate = convertDate(movie.getReleaseDate());
-	    	System.out.println("MySQL date:" + convertedDate);
+//	    	System.out.println("MySQL date:" + convertedDate);
 	        statement = conn.prepareStatement("SELECT fn_check_subscription(?, ?, ?);");
 	        statement.setString(1, userEmail);
 	        statement.setString(2, movie.getTitle());
@@ -95,18 +88,14 @@ public class DatabaseHandler {
 		    }
 	    } catch (SQLException e) {
 	        throw new IllegalStateException("Cannot connect to database.", e);
-	    } finally {
-	        try { statement.close(); } catch (Exception e) { /* ignored */ }
-	        try { conn.close(); } catch (Exception e) { /* ignored */ }
-	        try { rs.close(); } catch (Exception e) { /* ignored */ }
-	    }
+	    } 
     	return subscribed;
     }
 	
 	public static void addSubscription(Movie movie, String userEmail) {	
-    	System.out.println("Connecting to database...");
+//    	System.out.println("Connecting to database...");
 	    try (Connection conn = DriverManager.getConnection(url, username, password)) {		    	
-	    	System.out.println("Database connected.");
+//	    	System.out.println("Database connected.");
 	    	String convertedDate = convertDate(movie.getReleaseDate());
 	        PreparedStatement statement = conn.prepareStatement("call sp_add_subscription(?, ?, ?);");
 	        statement.setString(1, userEmail);
@@ -125,6 +114,7 @@ public class DatabaseHandler {
 	
 
 	void removeSubscription(Movie movie, String userEmail) {
+		// TODO Stored procedure does not exist in the database yet.
     	System.out.println("Connecting to database...");
 	    try (Connection conn = DriverManager.getConnection(url, username, password)) {		    	
 	    	System.out.println("Database connected.");
@@ -144,6 +134,24 @@ public class DatabaseHandler {
 	    }
 	}
 
-	
+	public static ArrayList<Alert> getTodaysAlerts() {
+		ArrayList<Alert> alerts = null;
+		System.out.println("Connecting to database...");
+		ResultSet rs = null;
+		Connection conn = null;
+		PreparedStatement statement = null;
+	    try {
+	    	conn = DriverManager.getConnection(url, username, password);
+	    	System.out.println("Database connected.");
+	        statement = conn.prepareStatement("");  // TODO enter query and process alerts
+	        rs = statement.executeQuery();
+			while (rs.next()) {
+				
+			}
+	    } catch (SQLException e) {
+	        throw new IllegalStateException("Cannot connect to database.", e);
+	    } 
+	    return alerts;
+	}
 
 }
