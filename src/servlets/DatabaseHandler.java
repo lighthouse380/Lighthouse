@@ -5,53 +5,100 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class DatabaseHandler {
 	
-	static String url = "jdbc:mysql://104.197.167.29:3306/LighthouseDB";
+	static String url = "jdbc:mysql://localhost:3306/LighthouseDB"; 
 	static String username = "root";
 	static String password = "password";
     
 	
-	private static ResultSet queryDatabase(String preparedStatement) {
+	
+	
+	public static void printUsers() {
     	System.out.println("Connecting to database...");
     	ResultSet rs = null;
-	    try (Connection conn = DriverManager.getConnection(url, username, password)) {		    	
+    	Connection conn = null;
+    	PreparedStatement statement = null;
+	    try {
+	    	conn = DriverManager.getConnection(url, username, password);
 	    	System.out.println("Database connected.");
-	        PreparedStatement statement = conn.prepareStatement(preparedStatement);
+	        statement = conn.prepareStatement("SELECT * from User");
 	        rs = statement.executeQuery();
-		    rs = statement.executeQuery("SELECT * from User");
 			while (rs.next()) {
-				System.out.println(rs.getString("email"));
+				System.out.println(rs.getString("email") + " " + rs.getString("user_id"));
 			}
 	    } catch (SQLException e) {
 	        throw new IllegalStateException("Cannot connect to database.", e);
+	    } finally {
+	        try { statement.close(); } catch (Exception e) { /* ignored */ }
+	        try { conn.close(); } catch (Exception e) { /* ignored */ }
+	        try { rs.close(); } catch (Exception e) { /* ignored */ }
 	    }
-	    return rs;
 	}
     
-    public static void addUser(String userEmail) throws SQLException  {
-    	String preparedStatement = "call sp_add_user('" + userEmail + "');";
-        queryDatabase(preparedStatement);
-    }
-
-    public static boolean checkSubscription(Movie movie, String userEmail){
+    public static void addUser(String userEmail)  {
     	System.out.println("Connecting to database...");
-    	boolean subscribed = false;
-	    try (Connection conn = DriverManager.getConnection(url, username, password)) {		    	
+    	ResultSet rs = null;
+    	Connection conn = null;
+    	PreparedStatement statement = null;
+	    try {
+	    	conn = DriverManager.getConnection(url, username, password);
 	    	System.out.println("Database connected.");
-	        PreparedStatement statement = conn.prepareStatement("call sp_check_subscription('" + userEmail 
-	        		+ "', '" + movie.getTitle() + "', '" + movie.getReleaseDate().toString() + ");");
-	        ResultSet rs = statement.executeQuery();
-	        if (rs.first()) {
-	        	subscribed = true;
-			    while (rs.next()) {
-			    	System.out.println(rs.getString("movie_id"));
-			    }
-	        } 
+	        statement = conn.prepareStatement("call sp_add_user(?);");
+	        statement.setString(1, userEmail);
+	        rs = statement.executeQuery();
 	    } catch (SQLException e) {
 	        throw new IllegalStateException("Cannot connect to database.", e);
+	    } finally {
+	        try { statement.close(); } catch (Exception e) { /* ignored */ }
+	        try { conn.close(); } catch (Exception e) { /* ignored */ }
+	        try { rs.close(); } catch (Exception e) { /* ignored */ }
+	    }
+    }
+    
+    private static String convertDate(Date javaDate) {
+    	java.text.SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    	String mySQLdate = sdf.format(javaDate);
+    	return mySQLdate;
+    }
+
+    public static boolean checkSubscription(Movie movie, String userEmail) throws SQLException{
+    	boolean subscribed = false;
+    	System.out.println("Connecting to database...");
+    	ResultSet rs = null;
+    	Connection conn = null;
+    	PreparedStatement statement = null;
+	    try {
+	    	conn = DriverManager.getConnection(url, username, password);
+	    	System.out.println("Database connected.");
+	    	System.out.println("Java date:" + movie.getReleaseDate());
+	    	String convertedDate = convertDate(movie.getReleaseDate());
+	    	System.out.println("MySQL date:" + convertedDate);
+	        statement = conn.prepareStatement("SELECT fn_check_subscription(?, ?, ?);");
+	        statement.setString(1, userEmail);
+	        statement.setString(2, movie.getTitle());
+	        statement.setString(3, convertedDate);
+	        rs = statement.executeQuery();
+	        if (rs.next()) {
+	        	if (rs.getBoolean(1)) {
+	        		subscribed = true;
+	        		//System.out.println("Subscribed");
+	        	} else {
+	        		//System.out.println("Not subscribed");
+	        	}
+		    } else {
+		    	System.out.println("Subscription information not found.");
+		    }
+	    } catch (SQLException e) {
+	        throw new IllegalStateException("Cannot connect to database.", e);
+	    } finally {
+	        try { statement.close(); } catch (Exception e) { /* ignored */ }
+	        try { conn.close(); } catch (Exception e) { /* ignored */ }
+	        try { rs.close(); } catch (Exception e) { /* ignored */ }
 	    }
     	return subscribed;
     }
@@ -60,12 +107,16 @@ public class DatabaseHandler {
     	System.out.println("Connecting to database...");
 	    try (Connection conn = DriverManager.getConnection(url, username, password)) {		    	
 	    	System.out.println("Database connected.");
-	        PreparedStatement statement = conn.prepareStatement("call sp_add_subscription('" + userEmail 
-	        		+ "', '" + movie.getTitle() + "', '" + movie.getReleaseDate().toString() + ");");
+	    	String convertedDate = convertDate(movie.getReleaseDate());
+	        PreparedStatement statement = conn.prepareStatement("call sp_add_subscription(?, ?, ?);");
+	        statement.setString(1, userEmail);
+	        statement.setString(2, movie.getTitle());
+	        statement.setString(3, convertedDate);   
 	        ResultSet rs = statement.executeQuery();
 	        rs = statement.executeQuery("SELECT * from Subscription");
 		    while (rs.next()) {
-		    	System.out.println(rs.getString("movie_id"));
+		    	System.out.print(rs.getString("movie_id") + "   ");
+		    	System.out.println(rs.getString("user_id"));
 		    }
 	    } catch (SQLException e) {
 	        throw new IllegalStateException("Cannot connect to database.", e);

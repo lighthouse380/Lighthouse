@@ -77,11 +77,8 @@ public class LighthouseServlet extends HttpServlet {
 			String cacheKey = "UserPrefs:" + user.getUserId();
 			userPrefs = (Entity)memcache.get(cacheKey);
 			
-			try {
-				DatabaseHandler.addUser(user.getEmail());
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
+			DatabaseHandler.addUser(user.getEmail());
+//			DatabaseHandler.printUsers();
 
 			//LOGGING MEMCACHE (OPTIONAL)
 			if(userPrefs == null){
@@ -106,6 +103,9 @@ public class LighthouseServlet extends HttpServlet {
 				try {
 					searchResults = this.getMoviesInfo(movieTitle, user);
 				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -134,7 +134,7 @@ public class LighthouseServlet extends HttpServlet {
 		
 		Date movieDate = null;
 		try {
-			movieDate = this.parseDate(req.getParameter("releaseDate"), "yyyy-MM-dd");
+			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -146,7 +146,7 @@ public class LighthouseServlet extends HttpServlet {
 		resp.sendRedirect("/");
 	}
 	
-	 private ArrayList<Movie> getMoviesInfo(String title, User user) throws MalformedURLException, IOException, ParseException{
+	 private ArrayList<Movie> getMoviesInfo(String title, User user) throws MalformedURLException, IOException, ParseException, SQLException{
 		 	ArrayList<Movie> movieList = new ArrayList<Movie>();
 		 	
 	    	String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=" + title;
@@ -173,7 +173,7 @@ public class LighthouseServlet extends HttpServlet {
 	                if (!dateString.isEmpty())
 	                	releaseDate = this.parseDate(dateString, "yyyy-MM-dd");
 	                else
-	                	releaseDate = this.parseDate("000-00-00", "yyyy-MM-dd"); //no date found
+	                	releaseDate = this.parseDate("0000-00-00", "yyyy-MM-dd"); //no date found
 	                
 	                if (!dataset.get("poster_path").isJsonNull()){
 	                	imgUrl = dataset.get("poster_path").getAsString();
