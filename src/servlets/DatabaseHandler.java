@@ -145,8 +145,12 @@ public class DatabaseHandler {
 	    	System.out.println("Database connected.");
 	        statement = conn.prepareStatement("");  // TODO enter query and process alerts
 	        rs = statement.executeQuery();
+	        String currTitle = null;
+	        if (rs.next()) {
+	        	currTitle = rs.getString("title");
+	        }
 			while (rs.next()) {
-				
+				rs.getString("title");
 			}
 	    } catch (SQLException e) {
 	        throw new IllegalStateException("Cannot connect to database.", e);
