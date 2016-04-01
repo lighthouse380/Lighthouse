@@ -19,7 +19,6 @@ public class Movie {
 	
 	
 	void subscribe(String userID) {
-		DatabaseHandler dh = new DatabaseHandler();
 		DatabaseHandler.addSubscription(this, userID);
 	}
 	
