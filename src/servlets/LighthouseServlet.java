@@ -61,7 +61,7 @@ public class LighthouseServlet extends HttpServlet {
 		
 			
 			if (user != null) {
-				//DatabaseHandler.addUser(user.getEmail());				
+				DatabaseHandler.addUser(user.getEmail());				
 			}
 //			DatabaseHandler.printUsers();
 
@@ -105,7 +105,7 @@ public class LighthouseServlet extends HttpServlet {
 		}
 
 		Movie movie = new Movie(movieTitle, movieDate, movieImg);
-//		DatabaseHandler.addSubscription(movie, userEmail);
+		DatabaseHandler.addSubscription(movie, userEmail);
 		
 		resp.sendRedirect("/");
 	}
@@ -148,10 +148,10 @@ public class LighthouseServlet extends HttpServlet {
 	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
 
-//	                if (user != null && DatabaseHandler.checkSubscription(movie, user.getEmail()))
-//	                	movie.subscribed = true;
-//	                else
-//	                	movie.subscribed = false;
+	                if (user != null && DatabaseHandler.checkSubscription(movie, user.getEmail()))
+	                	movie.subscribed = true;
+	                else
+	                	movie.subscribed = false;
 	                
 
 	                movieList.add(movie);
