@@ -124,7 +124,24 @@ public class DatabaseHandler {
 	}
 	
 
-	void removeSubscription(Movie movie, String userID) {
+	void removeSubscription(Movie movie, String userEmail) {
+    	System.out.println("Connecting to database...");
+	    try (Connection conn = DriverManager.getConnection(url, username, password)) {		    	
+	    	System.out.println("Database connected.");
+	    	String convertedDate = convertDate(movie.getReleaseDate());
+	        PreparedStatement statement = conn.prepareStatement("call sp_remove_subscription(?, ?, ?);");
+	        statement.setString(1, userEmail);
+	        statement.setString(2, movie.getTitle());
+	        statement.setString(3, convertedDate);   
+	        ResultSet rs = statement.executeQuery();
+	        rs = statement.executeQuery("SELECT * from Subscription");
+		    while (rs.next()) {
+		    	System.out.print(rs.getString("movie_id") + "   ");
+		    	System.out.println(rs.getString("user_id"));
+		    }
+	    } catch (SQLException e) {
+	        throw new IllegalStateException("Cannot connect to database.", e);
+	    }
 	}
 
 	
