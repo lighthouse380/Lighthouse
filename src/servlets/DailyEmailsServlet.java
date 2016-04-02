@@ -69,29 +69,24 @@ public class DailyEmailsServlet extends HttpServlet {
 //    					return new PasswordAuthentication(lighthouseEmail, lighthousePassword); 
 //    					} 
 //    				});
-//    	String alertEmail;
-//    	for (Alert alert : alerts) {  // TODO UNCOMMENT TO PROCESS ALERTS
-//    		System.out.println(alert.getTitle() + " " + alert.getReleaseDate());
-//    		for (String email : alert.getEmailAddresses()) {
-//    			System.out.println(email);
-//    		}
+    	for (Alert alert : alerts) {  
+    		System.out.println(alert.getTitle() + " " + alert.getReleaseDate());
+    		for (String email : alert.getEmailAddresses()) {
+    			System.out.println(email);
+    		}
     		try {
 	    	    Message msg = new MimeMessage(session);
 	    	    msg.setFrom(new InternetAddress(lighthouseEmail, "Lighthouse"));
 	    	    msg.setSubject("Lighthouse Subscription Reminder Email");
-//	    	    msg.setText(alert.getTitle() + " will be released on " + alert.getReleaseDate()); // Uses message body to send the text
-//	    	    for (String email : alert.getEmailAddresses()) {
-//		    	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));   
-//		    	    Transport.send(msg);  //javax.mail.Transport to send the email in MimeMessage	    	    	
-//	    	    }
-	    	    Date dt = new Date();
-	    	    msg.setText("BLAH" + " will be released on " + dt); // Uses message body to send the text
-	    	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("carrickdb@gmail.com"));   
-	    	    Transport.send(msg);  //javax.mail.Transport to send the email in MimeMessage	    	    	
+	    	    msg.setText(alert.getTitle() + " will be released on " + alert.getReleaseDate()); // TODO eliminate time from release date
+	    	    for (String email : alert.getEmailAddresses()) {
+		    	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));   
+		    	    Transport.send(msg);  //javax.mail.Transport to send the email in MimeMessage	    	    	
+	    	    }	    	    	
 	    	} catch (UnsupportedEncodingException | MessagingException e) {
 	        	writer.println(e.toString());   
 	    	}
-//    	}
+    	}
     	
     }
     	

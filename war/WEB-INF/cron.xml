@@ -5,7 +5,7 @@
 <!--   	<cron>
 	    <url>/dailyemails</url>
 	    <description>Mail out each day's release date reminders</description>
-	    <schedule>every 1 minutes</schedule>
+	    <schedule>every day 11:30</schedule>
 	</cron> -->
 <!-- 	<cron>
 	    <url>/helloworld</url>
