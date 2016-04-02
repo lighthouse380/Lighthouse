@@ -15,7 +15,11 @@ To receive email, you must put a section that enables incoming mail in your app'
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -42,7 +46,13 @@ import java.util.ArrayList;
 public class DailyEmailsServlet extends HttpServlet {
     
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException  {
-//    	ArrayList<Alert> alerts = DatabaseHandler.getTodaysAlerts();
+    	ArrayList<Alert> alerts = new ArrayList<>();
+		try {
+			alerts = DatabaseHandler.getTodaysAlerts();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
     	PrintWriter writer = resp.getWriter();
 //    	writer.println("Hello from DailyEmails");
     	final String lighthouseEmail = "thelighthouse380@gmail.com"; 
@@ -59,21 +69,28 @@ public class DailyEmailsServlet extends HttpServlet {
 //    					return new PasswordAuthentication(lighthouseEmail, lighthousePassword); 
 //    					} 
 //    				});
-    	
 //    	String alertEmail;
-//    	for (Alert currAlert : alerts) {
-	    	try {
+//    	for (Alert alert : alerts) {  // TODO UNCOMMENT TO PROCESS ALERTS
+//    		System.out.println(alert.getTitle() + " " + alert.getReleaseDate());
+//    		for (String email : alert.getEmailAddresses()) {
+//    			System.out.println(email);
+//    		}
+    		try {
 	    	    Message msg = new MimeMessage(session);
 	    	    msg.setFrom(new InternetAddress(lighthouseEmail, "Lighthouse"));
-	    	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("carrickdb@gmail.com"));   
 	    	    msg.setSubject("Lighthouse Subscription Reminder Email");
-	    	    msg.setText("mgjgjhgjh"); // Uses message body to send the text
-	    	    Transport.send(msg);  //javax.mail.Transport to send the email in MimeMessage
-	        	writer.println("Email supposedly sent.");
+//	    	    msg.setText(alert.getTitle() + " will be released on " + alert.getReleaseDate()); // Uses message body to send the text
+//	    	    for (String email : alert.getEmailAddresses()) {
+//		    	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));   
+//		    	    Transport.send(msg);  //javax.mail.Transport to send the email in MimeMessage	    	    	
+//	    	    }
+	    	    Date dt = new Date();
+	    	    msg.setText("BLAH" + " will be released on " + dt); // Uses message body to send the text
+	    	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("carrickdb@gmail.com"));   
+	    	    Transport.send(msg);  //javax.mail.Transport to send the email in MimeMessage	    	    	
 	    	} catch (UnsupportedEncodingException | MessagingException e) {
-	        	writer.println(e.toString());
-	    	    
-	    	}     		
+	        	writer.println(e.toString());   
+	    	}
 //    	}
     	
     }

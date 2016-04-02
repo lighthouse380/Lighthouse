@@ -44,7 +44,6 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/dailyemails</url-pattern>
 	</servlet-mapping>
 	
-	
 <!-- 	<servlet>
 		<servlet-name>HelloWorld</servlet-name>
 		<servlet-class>servlets.HelloWorldServlet</servlet-class>

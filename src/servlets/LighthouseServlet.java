@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.logging.Logger;
@@ -58,12 +59,19 @@ public class LighthouseServlet extends HttpServlet {
 		req.setAttribute("loginUrl", loginUrl);
 		req.setAttribute("logoutUrl", logoutUrl);
 			
-//			if (user != null) {
-//				DatabaseHandler.addUser(user.getEmail());				
-//			}
-//			DatabaseHandler.printUsers();
-
-			
+		if (user != null) {
+			try {
+				DatabaseHandler.addUser(user.getEmail());
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}				
+		}
+		try {
+			DatabaseHandler.printUsers();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 	 	if (movieTitle != null && movieTitle != ""){		
 			movieTitle = uriEncode(movieTitle);
@@ -73,19 +81,15 @@ public class LighthouseServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
-			
-
 		
 		req.setAttribute("searchResults", searchResults);
 		req.setAttribute("currentTime", fmt.format(new Date()));
 		req.setAttribute("movie_title", movieTitle);
-
 		
 		resp.setContentType("text/html");
 		
 		RequestDispatcher jsp = req.getRequestDispatcher("/WEB-INF/home.jsp");
 		jsp.forward(req, resp);
-		
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -105,12 +109,15 @@ public class LighthouseServlet extends HttpServlet {
 		}
 
 		Movie movie = new Movie(movieTitle, movieDate, movieImg);
-		DatabaseHandler.addSubscription(movie, userEmail);
 		String searchTitle = req.getParameter("movie_title");
 		searchTitle = uriEncode(searchTitle);
 
-//		DatabaseHandler.addSubscription(movie, userEmail);
-		
+		try {
+			DatabaseHandler.addSubscription(movie, userEmail);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		resp.sendRedirect("/?movie_title=" + searchTitle);
 	}
@@ -133,6 +140,7 @@ public class LighthouseServlet extends HttpServlet {
 	            JsonObject pages = element.getAsJsonObject();
 	            //System.out.println("Page " + pages.get("page").getAsString());
 	            JsonArray datasets = pages.getAsJsonArray("results");
+            	HashSet<Movie> subscriptions = DatabaseHandler.getSubscriptions(user.getEmail());
 	            for (int i = 0; i < datasets.size(); i++) {
 	                JsonObject dataset = datasets.get(i).getAsJsonObject();
 	                String dateString = dataset.get("release_date").getAsString();
@@ -153,11 +161,11 @@ public class LighthouseServlet extends HttpServlet {
 	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
 
-//	                if (user != null && DatabaseHandler.checkSubscription(movie, user.getEmail()))
-//	                	movie.subscribed = true;
-//	                else
-//	                	movie.subscribed = false;
-//	                
+	                if (user != null && subscriptions.contains(movie)) {
+	                	movie.subscribed = true;
+	                } else {
+	                	movie.subscribed = false;	                	
+	                }
 
 	                movieList.add(movie);
 	            }
