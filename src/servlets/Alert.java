@@ -1,10 +1,3 @@
-/* 
- * Class: 			Alert
- * Author:			Khajag Basmajian
- * Date Created:	03-20-2016
- * Purpose:			Holds information about alerts, including a movie's title, release date, and subscribers.
- * 
- * */
 package servlets;
 
 import java.util.ArrayList;
