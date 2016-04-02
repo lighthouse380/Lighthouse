@@ -38,6 +38,7 @@ import javax.activation.DataHandler;
 import java.util.ArrayList;
 
 
+@SuppressWarnings("serial")
 public class DailyEmailsServlet extends HttpServlet {
     
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException  {
