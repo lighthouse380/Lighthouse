@@ -2,11 +2,11 @@
 
 <cronentries>
 	
- 	<cron>
-	    <url>/dailyreminders</url>
-	    <description>Mail out a daily reminder of movie releases</description>
-	    <schedule>every day 11:30</schedule>
-	</cron> 
+<!--  	<cron>
+	    <url>/dailyemails</url>
+	    <description>Mail out each day's release date reminders</description>
+	    <schedule>every 1 minutes</schedule>
+	</cron>  -->
 <!-- 	<cron>
 	    <url>/helloworld</url>
 	    <description>Prints hello world.</description>

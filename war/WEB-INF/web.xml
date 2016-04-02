@@ -35,6 +35,16 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		</auth-constraint>
 	</security-constraint>
 	
+	<servlet>
+		<servlet-name>DailyEmails</servlet-name>
+		<servlet-class>servlets.DailyEmailsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DailyEmails</servlet-name>
+		<url-pattern>/dailyemails</url-pattern>
+	</servlet-mapping>
+	
+	
 <!-- 	<servlet>
 		<servlet-name>HelloWorld</servlet-name>
 		<servlet-class>servlets.HelloWorldServlet</servlet-class>

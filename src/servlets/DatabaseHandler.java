@@ -13,6 +13,7 @@ import java.util.Date;
 public class DatabaseHandler {
 	
 	static String url = "jdbc:mysql://localhost:3306/LighthouseDB"; 
+	// TODO enable for Cloud SQL
 	static String username = "root";
 	static String password = "password";
     
@@ -141,14 +142,21 @@ public class DatabaseHandler {
 	    try {
 	    	conn = DriverManager.getConnection(url, username, password);
 	    	System.out.println("Database connected.");
-	        statement = conn.prepareStatement("");  // TODO enter query and process alerts
+	        statement = conn.prepareStatement("call sp_get_todays_alerts();");
 	        rs = statement.executeQuery();
 	        String currTitle = null;
+	        Alert newAlert = null;
+	        ArrayList<String> emailAddresses = null;
 	        if (rs.next()) {
 	        	currTitle = rs.getString("title");
+//	        	newAlert = newAlert(currTitle);
+	        	alerts.add(newAlert);
+
 	        }
 			while (rs.next()) {
-				rs.getString("title");
+	        	if (currTitle != rs.getString("title")) {
+		        	currTitle = rs.getString("title"); 		
+	        	}
 			}
 	    } catch (SQLException e) {
 	        throw new IllegalStateException("Cannot connect to database.", e);
