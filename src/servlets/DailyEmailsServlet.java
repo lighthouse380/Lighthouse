@@ -1,12 +1,12 @@
+/* 
+ * Class: 			DailyEmailsServlet
+ * Author:			Carrick Bartle and Sevan Gregorian
+ * Date Created:	03-31-2016
+ * Purpose:			Emails all release date reminders scheduled for that day. See cron.xml for run frequency.
+ * 
+ * */
+
 package servlets;
-
-/*
-To receive email, you must put a section that enables incoming mail in your app's appengine-web.xml file:
-
-<inbound-services>
-  <service>mail</service>
-</inbound-services>
-*/
 
 //https://cloud.google.com/appengine/docs/java/config/cron   Cron Info
 //https://cloud.google.com/appengine/docs/java/mail/         Mail Servlet Info
@@ -16,28 +16,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;   //both sender and receiving email addresses are represented through this
-import javax.mail.Multipart;
+import javax.mail.internet.InternetAddress;   // Both sender and receiving email addresses are represented through this
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.mail.PasswordAuthentication;
-
-import java.io.InputStream;
-
-import javax.activation.DataHandler;
 
 import java.util.ArrayList;
 
@@ -46,6 +35,14 @@ import java.util.ArrayList;
 public class DailyEmailsServlet extends HttpServlet {
     
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException  {
+		/* 
+		 * Method Name:		doGet()
+		 * Author:			Carrick Bartle and Sevan Gregorian
+		 * Date Created:	04-01-2016
+		 * Purpose:			Emails all release date reminders scheduled for today.
+		 * Input: 			HttpServletRequest and HttpServletResponse. 
+		 * Return:			N/A			
+		 * */
     	ArrayList<Alert> alerts = new ArrayList<>();
 		try {
 			alerts = DatabaseHandler.getTodaysAlerts();
@@ -78,10 +75,10 @@ public class DailyEmailsServlet extends HttpServlet {
 	    	    Message msg = new MimeMessage(session);
 	    	    msg.setFrom(new InternetAddress(lighthouseEmail, "Lighthouse"));
 	    	    msg.setSubject("Lighthouse Subscription Reminder Email");
-	    	    msg.setText(alert.getTitle() + " will be released on " + alert.getReleaseDate()); // TODO eliminate time from release date
+	    	    msg.setText(alert.getTitle() + " will be released on " + alert.getReleaseDate());
 	    	    for (String email : alert.getEmailAddresses()) {
 		    	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));   
-		    	    Transport.send(msg);  //javax.mail.Transport to send the email in MimeMessage	    	    	
+		    	    Transport.send(msg);  // Sends the email in a MimeMessage.	    	    	
 	    	    }	    	    	
 	    	} catch (UnsupportedEncodingException | MessagingException e) {
 	        	writer.println(e.toString());   
