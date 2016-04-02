@@ -36,11 +36,11 @@ import com.google.gson.JsonParser;
 @SuppressWarnings("serial")
 public class LighthouseServlet extends HttpServlet {
 	
-	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
+	// private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		
-		log.warning("Hello from LighthouseServlet");
+		//log.warning("Hello from LighthouseServlet");
 		
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
@@ -54,15 +54,13 @@ public class LighthouseServlet extends HttpServlet {
 		ArrayList<Movie> searchResults = new ArrayList<Movie>();
 		String movieTitle = req.getParameter("movie_title");
 
-		
 		req.setAttribute("user", user);
 		req.setAttribute("loginUrl", loginUrl);
 		req.setAttribute("logoutUrl", logoutUrl);
-		
 			
-			if (user != null) {
-				DatabaseHandler.addUser(user.getEmail());				
-			}
+//			if (user != null) {
+//				DatabaseHandler.addUser(user.getEmail());				
+//			}
 //			DatabaseHandler.printUsers();
 
 			
@@ -105,7 +103,7 @@ public class LighthouseServlet extends HttpServlet {
 		}
 
 		Movie movie = new Movie(movieTitle, movieDate, movieImg);
-		DatabaseHandler.addSubscription(movie, userEmail);
+//		DatabaseHandler.addSubscription(movie, userEmail);
 		
 		resp.sendRedirect("/");
 	}
@@ -148,11 +146,11 @@ public class LighthouseServlet extends HttpServlet {
 	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
 
-	                if (user != null && DatabaseHandler.checkSubscription(movie, user.getEmail()))
-	                	movie.subscribed = true;
-	                else
-	                	movie.subscribed = false;
-	                
+//	                if (user != null && DatabaseHandler.checkSubscription(movie, user.getEmail()))
+//	                	movie.subscribed = true;
+//	                else
+//	                	movie.subscribed = false;
+//	                
 
 	                movieList.add(movie);
 	            }
