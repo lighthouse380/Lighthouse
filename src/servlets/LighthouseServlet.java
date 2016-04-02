@@ -80,6 +80,8 @@ public class LighthouseServlet extends HttpServlet {
 		
 		req.setAttribute("searchResults", searchResults);
 		req.setAttribute("currentTime", fmt.format(new Date()));
+		req.setAttribute("movie_title", movieTitle);
+
 		
 		resp.setContentType("text/html");
 		
@@ -106,8 +108,12 @@ public class LighthouseServlet extends HttpServlet {
 
 		Movie movie = new Movie(movieTitle, movieDate, movieImg);
 		DatabaseHandler.addSubscription(movie, userEmail);
+		String searchTitle = req.getParameter("movie_title");
+		searchTitle = uriEncode(searchTitle);
+
 		
-		resp.sendRedirect("/");
+		
+		resp.sendRedirect("/?movie_title=" + searchTitle);
 	}
 	
 	 private ArrayList<Movie> getMoviesInfo(String title, User user) throws MalformedURLException, IOException, ParseException, SQLException{

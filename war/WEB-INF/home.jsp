@@ -122,10 +122,11 @@
 				                <c:choose>
 					                <c:when test="${user != null}">
 						                <form action="/" method="post">
+						                	<input type="hidden" name="movie_title" value="${movie_title}" />
 						                	<input type="hidden" name="title" value="${movie.title}" />
 						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
 						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
-										    <button type="submit" value="Submit">Subscribe</button>
+										    <button type="submit" value="Submit" class="btn btn-success btn-lg" style="width:200px">Subscribe</button>
 										</form>
 									</c:when>
 									<c:otherwise>
@@ -138,7 +139,7 @@
 				            </c:when>
 				            <c:otherwise>
 				            	<h3>
-				                <a href="#">Unsubscribe</a>
+				                <button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:200px">Unsubscribe</button>
 				                </h3>
 				            </c:otherwise>
 				        </c:choose>
