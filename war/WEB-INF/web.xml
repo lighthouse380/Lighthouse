@@ -17,25 +17,6 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	</welcome-file-list>
 	
 	<servlet>
-		<servlet-name>Search</servlet-name>
-		<servlet-class>servlets.SearchServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>Search</servlet-name>
-		<url-pattern>/search</url-pattern>
-	</servlet-mapping>
-
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>search</web-resource-name>
-			<url-pattern>/search</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>*</role-name>
-		</auth-constraint>
-	</security-constraint>
-	
-	<servlet>
 		<servlet-name>DailyEmails</servlet-name>
 		<servlet-class>servlets.DailyEmailsServlet</servlet-class>
 	</servlet>
@@ -43,6 +24,17 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>DailyEmails</servlet-name>
 		<url-pattern>/dailyemails</url-pattern>
 	</servlet-mapping>
+	
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>DailyEmails</web-resource-name>
+			<url-pattern>/dailyemails</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+
 	
 <!-- 	<servlet>
 		<servlet-name>HelloWorld</servlet-name>

@@ -51,15 +51,15 @@
                         <c:choose>
 							<c:when test="${user != null}">
 							<li>
-								<a href="#">Welcome, ${user.email}!</a>
+								<a href="#" style="color:#FFF;">Welcome, ${user.email}!</a>
 							</li>
 							<li>
-								<a href="${logoutUrl}">Sign Out</a>.
+								<a href="${logoutUrl}" style="color:#FFF;">Sign Out</a>.
 							</li>
 							</c:when>
 							<c:otherwise>
 								<li>
-									<a href="${loginUrl }">Google Sign in</a>
+									<a href="${loginUrl }"><img src="img/btn_google_signin_light_normal_web.png" alt="Google Signin"></a>
 								</li>
 							</c:otherwise>
 						</c:choose>
@@ -131,7 +131,7 @@
 									</c:when>
 									<c:otherwise>
 										<form action="${loginUrl}">
-										    <input type="submit" value="Subscribe">
+										    <input  type="submit" value="Submit" class="btn btn-success btn-lg" style="width:200px">
 										</form>
 									</c:otherwise>
 								</c:choose>

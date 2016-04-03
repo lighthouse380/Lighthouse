@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,13 +36,8 @@ import com.google.gson.JsonParser;
 
 
 @SuppressWarnings("serial")
-public class LighthouseServlet extends HttpServlet {
-	
-	// private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
-	
+public class LighthouseServlet extends HttpServlet {	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-		
-		//log.warning("Hello from LighthouseServlet");
 		
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
@@ -74,12 +70,16 @@ public class LighthouseServlet extends HttpServlet {
 		}
 		
 	 	if (movieTitle != null && movieTitle != ""){		
-			movieTitle = uriEncode(movieTitle);
+			//movieTitle = uriEncode(movieTitle); //encode movie title for API call
+	 		movieTitle = java.net.URLEncoder.encode(movieTitle, "UTF-8");
+	 		
 			try {
 				searchResults = this.getMoviesInfo(movieTitle, user);
 			} catch (ParseException | SQLException e) {
 				e.printStackTrace();
 			}
+			//decode so search bar shows correct string
+			movieTitle = java.net.URLDecoder.decode(movieTitle, "UTF-8");
 		}
 		
 		req.setAttribute("searchResults", searchResults);
@@ -110,7 +110,6 @@ public class LighthouseServlet extends HttpServlet {
 
 		Movie movie = new Movie(movieTitle, movieDate, movieImg);
 		String searchTitle = req.getParameter("movie_title");
-		searchTitle = uriEncode(searchTitle);
 
 		try {
 			DatabaseHandler.addSubscription(movie, userEmail);
@@ -119,7 +118,7 @@ public class LighthouseServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect("/?movie_title=" + searchTitle);
+		resp.sendRedirect("/?movie_title=" + uriEncode(searchTitle));
 	}
 	
 	 private ArrayList<Movie> getMoviesInfo(String title, User user) throws MalformedURLException, IOException, ParseException, SQLException{
@@ -140,7 +139,13 @@ public class LighthouseServlet extends HttpServlet {
 	            JsonObject pages = element.getAsJsonObject();
 	            //System.out.println("Page " + pages.get("page").getAsString());
 	            JsonArray datasets = pages.getAsJsonArray("results");
-            	HashSet<Movie> subscriptions = DatabaseHandler.getSubscriptions(user.getEmail());
+	            
+	            //Get user's subscriptions to see if they're subscribed to any of the search results
+	            HashSet<Movie> subscriptions = null;
+	            if (user != null){
+            		subscriptions = DatabaseHandler.getSubscriptions(user.getEmail());
+	            }
+	            
 	            for (int i = 0; i < datasets.size(); i++) {
 	                JsonObject dataset = datasets.get(i).getAsJsonObject();
 	                String dateString = dataset.get("release_date").getAsString();
