@@ -78,18 +78,18 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Search Movies
-		            <div id="imaginary_container"> 
-		                <div class="input-group stylish-input-group">
-		                	<form class="navbar-form" action="/" method="get">
-			                    <input type="text" class="form-control"  placeholder="Movie title" name="movie_title" id="movie_title" type="text" value="${movie_title}">
-			                    <span class="input-group-addon">
-			                        <button type="submit">
-			                            <span class="glyphicon glyphicon-search"></span>
-			                        </button>  
-			                    </span>
-		                    </form>
-		                </div>
-		            </div>
+		            <div id="imaginary_container"> 							
+							<div class="input-group stylish-input-group">
+			                	<form class="navbar-form" action="/" method="get">
+				                    <input type="text" class="form-control"  placeholder="Movie title" name="movie_title" id="movie_title" type="text" value="${movie_title}">
+				                    <span class="input-group-addon">
+				                        <button type="submit">
+				                            <span class="glyphicon glyphicon-search"></span>
+				                        </button>  
+				                    </span>
+			                    </form>
+			                </div>
+					  </div>
                 </h1>
             </div>
         </div>
@@ -126,20 +126,26 @@
 						                	<input type="hidden" name="title" value="${movie.title}" />
 						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
 						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+						                	<input type="hidden" name="subscribed" value="false" />
 										    <button type="submit" value="Submit" class="btn btn-success btn-lg" style="width:200px">Subscribe</button>
 										</form>
 									</c:when>
 									<c:otherwise>
-										<form action="${loginUrl}">
-										    <input  type="submit" value="Submit" class="btn btn-success btn-lg" style="width:200px">
-										</form>
+										    <a href="${loginUrl }" class="btn btn-success btn-lg" style="width:200px"> Subscribe </a>
 									</c:otherwise>
 								</c:choose>
 				                </h3>
 				            </c:when>
 				            <c:otherwise>
 				            	<h3>
-				                <button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:200px">Unsubscribe</button>
+				            	<form action="/" method="post">
+						                	<input type="hidden" name="movie_title" value="${movie_title}" />
+						                	<input type="hidden" name="title" value="${movie.title}" />
+						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
+						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+						                	<input type="hidden" name="subscribed" value="true" />
+				                			<button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:200px">Unsubscribe</button>
+										</form>
 				                </h3>
 				            </c:otherwise>
 				        </c:choose>

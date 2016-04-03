@@ -33,6 +33,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 
 
 @SuppressWarnings("serial")
@@ -65,12 +66,11 @@ public class LighthouseServlet extends HttpServlet {
 		try {
 			DatabaseHandler.printUsers();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
 	 	if (movieTitle != null && movieTitle != ""){		
-			//movieTitle = uriEncode(movieTitle); //encode movie title for API call
+			//encode movie title for API call
 	 		movieTitle = java.net.URLEncoder.encode(movieTitle, "UTF-8");
 	 		
 			try {
@@ -99,12 +99,12 @@ public class LighthouseServlet extends HttpServlet {
 		
 		String movieTitle = req.getParameter("title");
 		String movieImg = req.getParameter("imgUrl");
+		String susbcribed = req.getParameter("subscribed");
 		
 		Date movieDate = null;
 		try {
 			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -112,13 +112,17 @@ public class LighthouseServlet extends HttpServlet {
 		String searchTitle = req.getParameter("movie_title");
 
 		try {
-			DatabaseHandler.addSubscription(movie, userEmail);
+			if (susbcribed.equalsIgnoreCase("false")){
+				DatabaseHandler.addSubscription(movie, userEmail);
+			} else {
+				DatabaseHandler.deleteSubscription(movie, userEmail);
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect("/?movie_title=" + uriEncode(searchTitle));
+		resp.sendRedirect("/?movie_title=" + java.net.URLEncoder.encode(searchTitle, "UTF-8"));
 	}
 	
 	 private ArrayList<Movie> getMoviesInfo(String title, User user) throws MalformedURLException, IOException, ParseException, SQLException{
@@ -179,24 +183,7 @@ public class LighthouseServlet extends HttpServlet {
 	        return movieList;
 	    }
 	    
-	    public String uriEncode(String string) {
-	        String result = string;
-	        if (null != string) {
-	            try {
-	                String scheme = null;
-	                String ssp = string;
-	                int es = string.indexOf(':');
-	                if (es > 0) {
-	                    scheme = string.substring(0, es);
-	                    ssp = string.substring(es + 1);
-	                }
-	                result = (new URI(scheme, ssp, null)).toString();
-	            } catch (URISyntaxException usex) {
-	                // ignore and use string that has syntax error
-	            }
-	        }
-	        return result;
-	    }
+	    
 	    
 	    private Map<String, SimpleDateFormat> hashFormatters = new HashMap<String, SimpleDateFormat>();
 
