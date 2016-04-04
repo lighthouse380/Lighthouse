@@ -43,6 +43,8 @@ public class DailyEmailsServlet extends HttpServlet {
 		 * Input: 			HttpServletRequest and HttpServletResponse. 
 		 * Return:			N/A			
 		 * */
+    	
+    	// Fetch all of today's alerts from the database, converted to Alert objects.
     	ArrayList<Alert> alerts = new ArrayList<>();
 		try {
 			alerts = DatabaseHandler.getTodaysAlerts();
@@ -50,11 +52,11 @@ public class DailyEmailsServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-    	PrintWriter writer = resp.getWriter();
+		
+		// Initialize JavaMail objects.
 //    	writer.println("Hello from DailyEmails");
     	final String lighthouseEmail = "thelighthouse380@gmail.com"; 
 //    	final String lighthousePassword = "W45ev5`J(#M4MT]2gjn>";
-    	
     	Properties props = new Properties();
 //    	props.put("mail.smtp.auth", "true");
 //    	props.put("mail.smtp.starttls.enable", "true");
@@ -66,21 +68,28 @@ public class DailyEmailsServlet extends HttpServlet {
 //    					return new PasswordAuthentication(lighthouseEmail, lighthousePassword); 
 //    					} 
 //    				});
+    	
+    	// Iterate through alerts.
     	for (Alert alert : alerts) {  
-    		System.out.println(alert.getTitle() + " " + alert.getReleaseDate());
-    		for (String email : alert.getEmailAddresses()) {
-    			System.out.println(email);
-    		}
+//    		System.out.println(alert.getTitle() + " " + alert.getReleaseDate());
+//    		for (String email : alert.getEmailAddresses()) {
+//    			System.out.println(email);
+//    		}
+    		
+    		// Prepare email message with a particular movie's title and release date.
     		try {
 	    	    Message msg = new MimeMessage(session);
 	    	    msg.setFrom(new InternetAddress(lighthouseEmail, "Lighthouse"));
 	    	    msg.setSubject("Lighthouse Subscription Reminder Email");
 	    	    msg.setText(alert.getTitle() + " will be released on " + alert.getReleaseDate());
+	    	    
+	    	    // Send the message to each subscriber to this movie.
 	    	    for (String email : alert.getEmailAddresses()) {
 		    	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));   
 		    	    Transport.send(msg);  // Sends the email in a MimeMessage.	    	    	
 	    	    }	    	    	
 	    	} catch (UnsupportedEncodingException | MessagingException e) {
+	        	PrintWriter writer = resp.getWriter();
 	        	writer.println(e.toString());   
 	    	}
     	}

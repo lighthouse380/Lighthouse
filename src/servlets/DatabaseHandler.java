@@ -25,20 +25,31 @@ public class DatabaseHandler {
 	
 //	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
 	
+	static Connection conn = null;
 	static String url = null;
+	static String username = "root";
+	static String password = "password";
 	static {
 		if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
 			// Running from Google App Engine.
 			url = "jdbc:google:mysql://lighthouse-1243:lighthousedb1/LighthouseDB";
+			try {
+				Class.forName("com.mysql.jdbc.GoogleDriver");
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			// Running locally.
 			url = "jdbc:mysql://localhost:3306/LighthouseDB";
 		}
+	    try {
+			conn = DriverManager.getConnection(url, username, password);
+		} catch (SQLException e) {}
 	}
-	static String username = "root";
-	static String password = "password";
+
 	
-	public static PreparedStatement getStatement(String query) {
+	public static PreparedStatement getStatement(String query) throws SQLException {
 		/* 
 		 * Method Name:		getStatement()
 		 * Author:			Carrick Bartle
@@ -48,21 +59,13 @@ public class DatabaseHandler {
 		 * Input: 			The query in string form.
 		 * Return:			A PreparedStatement for the query that can then be executed.			
 		 * */
+		
 //		log.warning("Hello from DatabaseHandler");
 //    	System.out.println("Connecting to database...");
-    	Connection conn = null;
+		// Connect to a Lighthouse database and create a prepared statement with the given query.
     	PreparedStatement statement = null;
-	    try {  // Connects to a Lighthouse database and creates a prepared statement with the given query.
-			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
-				// Running from Google App Engine.
-				Class.forName("com.mysql.jdbc.GoogleDriver");
-			}
-		    conn = DriverManager.getConnection(url, username, password);
 //	    	System.out.println("Database connected.");
-	        statement = conn.prepareStatement(query);
-	    } catch (SQLException | ClassNotFoundException e) {
-	        throw new IllegalStateException("Cannot connect to database.", e);
-	    } 
+	    statement = conn.prepareStatement(query);
 	    return statement;
 	}
     
@@ -76,7 +79,7 @@ public class DatabaseHandler {
 		 * Return:			N/A			
 		 * */
 		
-		// Connect to database and execute query.
+		// Get all the users in the database.
 		PreparedStatement ps = getStatement("SELECT * from User;");  
 		ResultSet rs = ps.executeQuery();
 		while (rs.next()) {   
@@ -95,7 +98,7 @@ public class DatabaseHandler {
 		 * Return:			N/A			
 		 * */
     	
-		// Connect to database and execute query.
+		// Submit query to the database to add the given user. 
 		PreparedStatement ps = getStatement("call sp_add_user(?);");
         ps.setString(1, userEmail);
 		ps.executeQuery();
@@ -112,8 +115,9 @@ public class DatabaseHandler {
 		 * Return:			A string with the given date in the form of "yyyy-MM-dd". 
 		 * */ 
  
+    	// Set the date format and convert the input Date into that format.
     	java.text.SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
-    	String mySQLdate = sdf.format(javaDate);  // Convert date to given format.
+    	String mySQLdate = sdf.format(javaDate);
     	return mySQLdate;
     }
 	
@@ -128,7 +132,11 @@ public class DatabaseHandler {
 		 * 					A string containing the user's email address.
 		 * Return:			N/A
 		 * */    
+		
+		// Convert the movie's release date into a MySQL-friendly string in the form of a date.
     	String convertedDate = convertDate(movie.getReleaseDate());
+    	
+    	// Send a query to the database to add a subscription to a movie for the user. 
         PreparedStatement statement = getStatement("call sp_add_subscription(?, ?, ?);");
         statement.setString(1, userEmail);
         statement.setString(2, movie.getTitle());
@@ -145,11 +153,15 @@ public class DatabaseHandler {
 		 * Purpose:			Fetches all the movies a given user is subscribed to.
 		 * Input: 			A string containing the user's email address.
 		 * Return:			HashSet of all the movies a given user is subscribed to
-		 * */    
-		HashSet<Movie> movies = new HashSet<>();
+		 * */   
+		
+		// Query the database to retrieve all the movies the user is subscribed to. 
         PreparedStatement statement = getStatement("call sp_get_subscriptions(?);");
         statement.setString(1, userEmail);
         ResultSet rs = statement.executeQuery();
+        
+        // Convert the results from the database into Movie objects.
+		HashSet<Movie> movies = new HashSet<>();
 		while (rs.next()) {
 			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), ""));
 //			log.warning(rs.getString("title"));
@@ -167,7 +179,11 @@ public class DatabaseHandler {
 		 * 					A string containing the user's email address.
 		 * Return:			N/A
 		 * */
-    	String convertedDate = convertDate(movie.getReleaseDate());
+		
+		 // Convert Date to MySQL-friendly date string.
+    	String convertedDate = convertDate(movie.getReleaseDate()); 
+    	
+		// Connect to database and execute query.
         PreparedStatement statement = getStatement("call sp_delete_subscription(?, ?, ?);");
         statement.setString(1, userEmail);
         statement.setString(2, movie.getTitle());
@@ -184,13 +200,22 @@ public class DatabaseHandler {
 		 * Input: 			N/A
 		 * Return:			An ArrayList of all the alerts scheduled for today.			
 		 * */    
+		
 		ArrayList<Alert> alerts = new ArrayList<>();
+
+		// Retrieve all of today's alerts from the database, sorted by title, then release date.
 		PreparedStatement statement = getStatement("call sp_get_todays_alerts();");
         ResultSet rs = statement.executeQuery();
+        
+        /*
+         *  Convert the results from the database into Alert objects.
+         */
         String currTitle = null;
         Date currDate = null;
         ArrayList<String> emailAddresses = new ArrayList<>();
-        if (rs.next()) {
+        
+        // Initialize the variables with information from the first alert before entering the loop.  
+        if (rs.next()) {   
     		currTitle = rs.getString("title");
     		currDate = rs.getDate("releaseDate");
     		emailAddresses.add(rs.getString("email"));
@@ -198,8 +223,11 @@ public class DatabaseHandler {
 //    		System.out.println(currDate);
 //    		System.out.println(rs.getString("email"));
         }
+        
+		// Get all the subscribers to each movie and add alerts when a new movie is reached.
 		while (rs.next()) {
-			if (currTitle != null && !currTitle.equals(rs.getString("title"))) {
+			if (currTitle != null && !(currTitle.equals(rs.getString("title"))
+					&& currDate.equals(rs.getDate("releaseDate")))) {
 //				System.out.print(currTitle);
 //				System.out.println(rs.getString("title"));
         		Alert newAlert = new Alert(currTitle, emailAddresses, currDate);
@@ -213,7 +241,9 @@ public class DatabaseHandler {
         	emailAddresses.add(rs.getString("email"));
 //    		System.out.println(rs.getString("email"));
 		}
-		if (currTitle != null) {
+		
+		// Reached the end of the results. Add the final alert.
+		if (currTitle != null) { 
 			Alert newAlert = new Alert(currTitle, emailAddresses, currDate);
 			alerts.add(newAlert);			
 		}
