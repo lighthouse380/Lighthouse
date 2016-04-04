@@ -1,5 +1,13 @@
-package servlets;
+/* 
+ * Class: 			LighthouseServlet
+ * Author:			Harout Grigoryan
+ * Date Created:	03-14-2016
+ * Purpose:			Handle GET and POST requests from home.jsp (homepage)
+ * 					Query TheMovieDB based on search title
+ * 
+ * */
 
+package servlets;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -40,6 +48,15 @@ import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 public class LighthouseServlet extends HttpServlet {	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		
+		/* 
+		 * Method Name:		doGet()
+		 * Author:			Harout Grigoryan
+		 * Date Created:	03-14-2016
+		 * Purpose:			Loads attributes of home.jsp and sends the page to the browser. 
+		 * Input: 			HTTP request and response which include attributes 
+		 * Return:			method is void, but produces the jsp page.			
+		 * */
+		
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
 		
@@ -74,7 +91,7 @@ public class LighthouseServlet extends HttpServlet {
 	 		movieTitle = java.net.URLEncoder.encode(movieTitle, "UTF-8");
 	 		
 			try {
-				searchResults = this.getMoviesInfo(movieTitle, user);
+				searchResults = this.getMovies(movieTitle, user);
 			} catch (ParseException | SQLException e) {
 				e.printStackTrace();
 			}
@@ -93,14 +110,27 @@ public class LighthouseServlet extends HttpServlet {
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		
+		/* 
+		 * Method Name:		doPost()
+		 * Author:			Harout Grigoryan
+		 * Date Created:	03-16-2016
+		 * Purpose:			Take homepage's POST requests which include subscribing/unsubscribing
+		 * 					then use DatabaseHandler to update the DB accordingly.
+		 * Input: 			HTTP request and response which include attributes
+		 * 					(such as the movie's information for subscribing)
+		 * Return:			method is void, redirects to the doGet	
+		 * */
+		
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		String userEmail = user.getEmail();
 		
+		//get movie's title, image URL, subscription status, release date
+		//from client based on the movie they are unsubscribing/subscribing to
 		String movieTitle = req.getParameter("title");
 		String movieImg = req.getParameter("imgUrl");
 		String susbcribed = req.getParameter("subscribed");
-		
 		Date movieDate = null;
 		try {
 			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
@@ -109,6 +139,9 @@ public class LighthouseServlet extends HttpServlet {
 		}
 
 		Movie movie = new Movie(movieTitle, movieDate, movieImg);
+		
+		//Get the search entry to reload the page with the same search results
+		//after they clicked sub/unsub
 		String searchTitle = req.getParameter("movie_title");
 
 		try {
@@ -118,31 +151,39 @@ public class LighthouseServlet extends HttpServlet {
 				DatabaseHandler.deleteSubscription(movie, userEmail);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		resp.sendRedirect("/?movie_title=" + java.net.URLEncoder.encode(searchTitle, "UTF-8"));
 	}
 	
-	 private ArrayList<Movie> getMoviesInfo(String title, User user) throws MalformedURLException, IOException, ParseException, SQLException{
-		 	ArrayList<Movie> movieList = new ArrayList<Movie>();
+	 private ArrayList<Movie> getMovies(String title, User user) throws MalformedURLException, IOException, ParseException, SQLException{
+			
+		 	/* 
+			 * Method Name:		getMovies()
+			 * Author:			Harout Grigoryan
+			 * Date Created:	03-16-2016
+			 * Purpose:			Do TheMovieDB API call based on client's search title,
+			 * 					parse the JSON from the API call, construct Movie
+			 * 					objects, add Movie objects to ArrayList for return
+			 * Input: 			Title being searched (UTF-8 encoded), current User that's signed in.
+			 * Return:			Arraylist of Movie objects for search results
+			 * */
+		 
+		 ArrayList<Movie> movieList = new ArrayList<Movie>();
 		 	
+		 	//Base URL for TheMovieDB API's movie search, append title to this
 	    	String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=" + title;
 	        String json = IOUtils.toString(new URL(url));
 	        JsonParser parser = new JsonParser();
 
-	        // The JsonElement is the root node. It can be an object, array, null or
-	        // java primitive.
+	        //Element is the root node of the parsed JSON
+	        //Using element we can access the keys/values in the JSON
 	        JsonElement element = parser.parse(json);
 	        	        
-	        // use the isxxx methods to find out the type of jsonelement. In our
-	        // example we know that the root object is the Albums object and
-	        // contains an array of dataset objects
 	        if (element.isJsonObject()) {
 	            JsonObject pages = element.getAsJsonObject();
-	            //System.out.println("Page " + pages.get("page").getAsString());
-	            JsonArray datasets = pages.getAsJsonArray("results");
+	            JsonArray movies = pages.getAsJsonArray("results");
 	            
 	            //Get user's subscriptions to see if they're subscribed to any of the search results
 	            HashSet<Movie> subscriptions = null;
@@ -150,8 +191,8 @@ public class LighthouseServlet extends HttpServlet {
             		subscriptions = DatabaseHandler.getSubscriptions(user.getEmail());
 	            }
 	            
-	            for (int i = 0; i < datasets.size(); i++) {
-	                JsonObject dataset = datasets.get(i).getAsJsonObject();
+	            for (int i = 0; i < movies.size(); i++) {
+	                JsonObject dataset = movies.get(i).getAsJsonObject();
 	                String dateString = dataset.get("release_date").getAsString();
 	                String imgUrl;
 	                Date releaseDate;
@@ -189,6 +230,15 @@ public class LighthouseServlet extends HttpServlet {
 
 	    public Date parseDate(String date, String format) throws ParseException
 	    {
+			/* 
+			 * Method Name:		parseDate()
+			 * Author:			Harout Grigoryan
+			 * Date Created:	03-16-2016
+			 * Purpose:			Creates Date formatted object based on given date string
+			 * Input: 			String with date and desired format for Date
+			 * Return:			Formatted Date object
+			 * */
+	    	
 	        SimpleDateFormat formatter = hashFormatters.get(format);
 
 	        if (formatter == null)

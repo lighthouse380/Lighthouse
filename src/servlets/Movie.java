@@ -152,20 +152,52 @@ public class Movie {
 	}
 
 	public String getImgUrl() {
+		/* 
+		 * Method Name:		getImgUrl()
+		 * Author:			Harout Grigoryan
+		 * Date Created:	03-23-2016
+		 * Purpose:			Returns the URL to the movie's poster image on 3rd party site
+		 * Input: 			N/A	
+		 * Return:			String with URL
+		 * */
 		return imgUrl;
 	}
 
 	public void setImgUrl(String imgUrl) {
+		/* 
+		 * Method Name:		setImgUrl()
+		 * Author:			Harout Grigoryan
+		 * Date Created:	03-23-2016
+		 * Purpose:			Sets the movie's image URL
+		 * Input: 			String with URL to movie's image	
+		 * Return:			N/A
+		 * */
 		this.imgUrl = imgUrl;
 	}
 
 
 	public Boolean getSubscribed() {
+		/* 
+		 * Method Name:		getSubscribed()
+		 * Author:			Harout Grigoryan
+		 * Date Created:	03-23-2016
+		 * Purpose:			Returns current user's subscription status for the movie
+		 * Input: 			N/A
+		 * Return:			Boolean with subscription status
+		 * */
 		return subscribed;
 	}
 
 
 	public void setSubscribed(Boolean subscribed) {
+		/* 
+		 * Method Name:		setSubscribed()
+		 * Author:			Harout Grigoryan
+		 * Date Created:	03-23-2016
+		 * Purpose:			Sets subscription status for the current user
+		 * Input: 			Subscription status boolean.	
+		 * Return:			N/A
+		 * */
 		this.subscribed = subscribed;
 	}
 
