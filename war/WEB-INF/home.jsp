@@ -1,7 +1,14 @@
+<!-- 
+ Name: 		    	home.jsp
+ Author:			Harout Grigoryan
+ Date Created:  	03-14-2016
+ Purpose:			Homepage for Lighthouse, serves for subscribing/unsubscribing,
+ 					Logging in/out, and searching movies.
+ -->
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
 
 <html lang="en">
 
@@ -78,7 +85,8 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Search Movies
-		            <div id="imaginary_container"> 							
+                	<h4>Subscribe to the movies you want to be reminded about before they're out!</h4>
+		            <div id="imaginary_container">
 							<div class="input-group stylish-input-group">
 			                	<form class="navbar-form" action="/" method="get">
 				                    <input type="text" class="form-control"  placeholder="Movie title" name="movie_title" id="movie_title" type="text" value="${movie_title}">
