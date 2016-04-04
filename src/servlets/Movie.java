@@ -30,6 +30,8 @@ public class Movie {
 		 * 					The URL in the form of a string.
 		 * Return:			A PreparedStatement for the query that can then be executed.			
 		 * */
+		
+		// Set movie's title, release date, and image URL.
 		this.title = title;
 		this.releaseDate = releaseDate;
 		this.imgUrl = imgUrl;
@@ -46,6 +48,8 @@ public class Movie {
 		 * Input: 			N/A
 		 * Return:			A hash code computed with the Movie object's title and release date.			
 		 * */
+    	
+    	// Compute hash code based on the title and release date. 
         final int prime = 31;
         int result = 1;
         result = prime * result + title.hashCode();
@@ -65,16 +69,18 @@ public class Movie {
 		 * Return:			A boolean that returns true if both objects are Movies with the same title and 
 		 * 					release date, and false otherwise.			
 		 * */
-        if (this == obj)
+        if (this == obj)  // Comparing this movie object to itself.
             return true;
-        if (obj == null)
+        
+        // Return false if the object is null or not the same class.
+        if (obj == null)  
             return false;
-        if (getClass() != obj.getClass())
+        if (getClass() != obj.getClass()) 
             return false;
         Movie otherMovie = (Movie) obj;
-        if (!title.equals(otherMovie.title))
+        if (!title.equals(otherMovie.title))  // Check title.
             return false;
-        if (!releaseDate.equals(otherMovie.releaseDate))
+        if (!releaseDate.equals(otherMovie.releaseDate))  // Check release date.
             return false;
         return true;
     }

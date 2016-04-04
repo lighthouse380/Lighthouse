@@ -36,7 +36,6 @@ public class DatabaseHandler {
 			try {
 				Class.forName("com.mysql.jdbc.GoogleDriver");
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
@@ -44,6 +43,7 @@ public class DatabaseHandler {
 			url = "jdbc:mysql://localhost:3306/LighthouseDB";
 		}
 	    try {
+            // Form one connection to the database.
 			conn = DriverManager.getConnection(url, username, password);
 		} catch (SQLException e) {}
 	}

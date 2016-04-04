@@ -22,5 +22,3 @@
 	    </retry-parameters>
   	</cron>
 </cronentries>
-
-<!--TODO: Add security so no one can access the dailyreminders URL except Lighthouse -->

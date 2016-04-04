@@ -89,7 +89,7 @@ public class DailyEmailsServlet extends HttpServlet {
 		    	    Transport.send(msg);  // Sends the email in a MimeMessage.	    	    	
 	    	    }	    	    	
 	    	} catch (UnsupportedEncodingException | MessagingException e) {
-	        	PrintWriter writer = resp.getWriter();
+	        	PrintWriter writer = resp.getWriter();  // Print the error message to the page.
 	        	writer.println(e.toString());   
 	    	}
     	}
