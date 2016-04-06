@@ -2,7 +2,7 @@
  * Class: 			Movie
  * Author:			Carrick Bartle and Harout Grigoryan
  * Date Created:	03-21-2016
- * Purpose:			Holds information about a movie and enables a user to subscribe to it.
+ * Purpose:			Holds information about a movie and enables a user to subscribe to and unsubscribe from it.
  * 
  * */
 package servlets;
@@ -162,7 +162,7 @@ public class Movie {
 		 * Method Name:		getImgUrl()
 		 * Author:			Harout Grigoryan
 		 * Date Created:	03-23-2016
-		 * Purpose:			Returns the URL to the movie's poster image on 3rd party site
+		 * Purpose:			Returns the URL to the movie's poster image on 3rd party site.
 		 * Input: 			N/A	
 		 * Return:			String with URL
 		 * */
@@ -174,7 +174,7 @@ public class Movie {
 		 * Method Name:		setImgUrl()
 		 * Author:			Harout Grigoryan
 		 * Date Created:	03-23-2016
-		 * Purpose:			Sets the movie's image URL
+		 * Purpose:			Sets the movie's image URL.
 		 * Input: 			String with URL to movie's image	
 		 * Return:			N/A
 		 * */
@@ -187,7 +187,7 @@ public class Movie {
 		 * Method Name:		getSubscribed()
 		 * Author:			Harout Grigoryan
 		 * Date Created:	03-23-2016
-		 * Purpose:			Returns current user's subscription status for the movie
+		 * Purpose:			Returns current user's subscription status for the movie.
 		 * Input: 			N/A
 		 * Return:			Boolean with subscription status
 		 * */
@@ -200,7 +200,7 @@ public class Movie {
 		 * Method Name:		setSubscribed()
 		 * Author:			Harout Grigoryan
 		 * Date Created:	03-23-2016
-		 * Purpose:			Sets subscription status for the current user
+		 * Purpose:			Sets subscription status for the current user.
 		 * Input: 			Subscription status boolean.	
 		 * Return:			N/A
 		 * */
