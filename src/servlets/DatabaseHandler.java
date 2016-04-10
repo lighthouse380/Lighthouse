@@ -23,30 +23,12 @@ import com.google.appengine.api.utils.SystemProperty;
 
 public class DatabaseHandler {
 	
-//	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
+	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
 	
 	static Connection conn = null;
 	static String url = null;
 	static String username = "root";
 	static String password = "password";
-	static {
-		if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
-			// Running from Google App Engine.
-			url = "jdbc:google:mysql://lighthouse-1243:lighthousedb1/LighthouseDB";
-			try {
-				Class.forName("com.mysql.jdbc.GoogleDriver");
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		} else {
-			// Running locally.
-			url = "jdbc:mysql://localhost:3306/LighthouseDB";
-		}
-	    try {
-            // Form one connection to the database.
-			conn = DriverManager.getConnection(url, username, password);
-		} catch (SQLException e) {}
-	}
 
 	
 	public static PreparedStatement getStatement(String query) throws SQLException {
@@ -63,6 +45,24 @@ public class DatabaseHandler {
 //		log.warning("Hello from DatabaseHandler");
 //    	System.out.println("Connecting to database...");
 		// Connect to a Lighthouse database and create a prepared statement with the given query.
+		if (conn == null) {
+			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
+				// Running from Google App Engine.
+				url = "jdbc:google:mysql://lighthouse-1243:lighthousedb1/LighthouseDB";
+				try {
+					Class.forName("com.mysql.jdbc.GoogleDriver");
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			} else {
+				// Running locally.
+				url = "jdbc:mysql://localhost:3306/LighthouseDB";
+			}
+		    try {
+	            // Form one connection to the database.
+				conn = DriverManager.getConnection(url, username, password);
+			} catch (SQLException e) {}
+		}
     	PreparedStatement statement = null;
 //	    	System.out.println("Database connected.");
 	    statement = conn.prepareStatement(query);
@@ -86,6 +86,8 @@ public class DatabaseHandler {
 			// Iterate through each row of the results to print each user's email address and database ID. 
 			System.out.println(rs.getString("email") + " " + rs.getString("user_id"));
 		}
+		conn.close();
+		conn = null;
 	}
     
     public static void addUser(String userEmail) throws SQLException  {	 
@@ -102,6 +104,8 @@ public class DatabaseHandler {
 		PreparedStatement ps = getStatement("call sp_add_user(?);");
         ps.setString(1, userEmail);
 		ps.executeQuery();
+		conn.close();
+		conn = null;
     }
     
     private static String convertDate(Date javaDate) {
@@ -143,6 +147,8 @@ public class DatabaseHandler {
         statement.setString(3, convertedDate);   
         statement.executeQuery();
 //        System.out.println("Supposedly subscribed");
+		conn.close();
+		conn = null;
 	}
 	
 	public static HashSet<Movie> getSubscriptions(String userEmail) throws SQLException {
@@ -166,6 +172,34 @@ public class DatabaseHandler {
 			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), ""));
 //			log.warning(rs.getString("title"));
 		}
+		conn.close();
+		conn = null;
+        return movies;
+	}
+	
+	public static ArrayList<Movie> getListofSubscriptions(String userEmail) throws SQLException {
+		/* 
+		 * Method Name: 	getListofSubscriptions()
+		 * Author:			Carrick Bartle
+		 * Date Created:	04-09-2016
+		 * Purpose:			Fetches all the movies a given user is subscribed to and returns them as an alphabetized list.
+		 * Input: 			A string containing the user's email address.
+		 * Return:			ArrayList of all the movies a given user is subscribed to.
+		 * */   
+		
+		// Query the database to retrieve all the movies the user is subscribed to. 
+        PreparedStatement statement = getStatement("call sp_get_subscriptions(?);");
+        statement.setString(1, userEmail);
+        ResultSet rs = statement.executeQuery();
+        
+        // Convert the results from the database into Movie objects.
+		ArrayList<Movie> movies = new ArrayList<>();
+		while (rs.next()) {
+			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), ""));
+//			log.warning(rs.getString("title"));
+		}
+		conn.close();
+		conn = null;
         return movies;
 	}
 	
@@ -189,6 +223,8 @@ public class DatabaseHandler {
         statement.setString(2, movie.getTitle());
         statement.setString(3, convertedDate);   
         statement.executeQuery();
+		conn.close();
+		conn = null;
 	}
 
 	public static ArrayList<Alert> getTodaysAlerts() throws SQLException {
@@ -247,6 +283,8 @@ public class DatabaseHandler {
 			Alert newAlert = new Alert(currTitle, emailAddresses, currDate);
 			alerts.add(newAlert);			
 		}
+		conn.close();
+		conn = null;
 	    return alerts;
 	}
 
