@@ -4,6 +4,15 @@ xmlns="http://java.sun.com/xml/ns/javaee"
 xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+
+<!--
+ File:          web.xml
+ Author:        Harout Grigoryan and Carrick Bartle
+ Date Created:  03-14-16
+ Purpose:       Maps URLS to servlets and jsp files; sets security constraints.
+-->
+
+    <!-- Mapping for Lighthouse servlet -->
 	<servlet>
 		<servlet-name>Lighthouse</servlet-name>
 		<servlet-class>servlets.LighthouseServlet</servlet-class>
@@ -16,24 +25,34 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<welcome-file>home.jsp</welcome-file>
 	</welcome-file-list>
 	
+	<!-- Mapping for DailyEmails servlet -->
 	<servlet>
-		<servlet-name>Search</servlet-name>
-		<servlet-class>servlets.SearchServlet</servlet-class>
+		<servlet-name>DailyEmails</servlet-name>
+		<servlet-class>servlets.DailyEmailsServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>Search</servlet-name>
-		<url-pattern>/search</url-pattern>
+		<servlet-name>DailyEmails</servlet-name>
+		<url-pattern>/dailyemails</url-pattern>
 	</servlet-mapping>
 	
-	
-
+    <!-- Prevents non-admin users from triggering reminder emails. -->
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>search</web-resource-name>
-			<url-pattern>/search</url-pattern>
+			<web-resource-name>DailyEmails</web-resource-name>
+			<url-pattern>/dailyemails</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
-			<role-name>*</role-name>
+			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
+
+	
+<!-- 	<servlet>
+		<servlet-name>HelloWorld</servlet-name>
+		<servlet-class>servlets.HelloWorldServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>HelloWorld</servlet-name>
+		<url-pattern>/helloworld</url-pattern>
+	</servlet-mapping> -->
 </web-app>

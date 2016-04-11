@@ -10,6 +10,7 @@ body {
 
 .portfolio-item {
     margin-bottom: 25px;
+    text-align: center;
 }
 
 footer {
@@ -19,6 +20,7 @@ footer {
 #imaginary_container{
     margin-top:2%; /* Don't copy this */
 }
+
 .stylish-input-group .input-group-addon{
     background: white !important; 
 }

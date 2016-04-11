@@ -1,7 +1,14 @@
+<!-- 
+ Name: 		    	home.jsp
+ Author:			Harout Grigoryan
+ Date Created:  	03-14-2016
+ Purpose:			Homepage for Lighthouse, serves for subscribing/unsubscribing,
+ 					Logging in/out, and searching movies.
+ -->
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
 
 <html lang="en">
 
@@ -51,15 +58,15 @@
                         <c:choose>
 							<c:when test="${user != null}">
 							<li>
-								<a href="#">Welcome, ${user.email}!</a>
+								<a href="#" style="color:#FFF;">Welcome, ${user.email}!</a>
 							</li>
 							<li>
-								<a href="${logoutUrl}">Sign Out</a>.
+								<a href="${logoutUrl}" style="color:#FFF;">Sign Out</a>.
 							</li>
 							</c:when>
 							<c:otherwise>
 								<li>
-									<a href="${loginUrl }">Google Sign in</a>
+									<a href="${loginUrl }"><img src="img/btn_google_signin_light_normal_web.png" alt="Google Signin"></a>
 								</li>
 							</c:otherwise>
 						</c:choose>
@@ -78,18 +85,19 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Search Movies
-		            <div id="imaginary_container"> 
-		                <div class="input-group stylish-input-group">
-		                	<form class="navbar-form" action="/" method="get">
-			                    <input type="text" class="form-control"  placeholder="Movie title" name="movie_title" id="movie_title" type="text" value="${movie_title}">
-			                    <span class="input-group-addon">
-			                        <button type="submit">
-			                            <span class="glyphicon glyphicon-search"></span>
-			                        </button>  
-			                    </span>
-		                    </form>
-		                </div>
-		            </div>
+                	<h4>Subscribe to the movies you want to be reminded about before they're out!</h4>
+		            <div id="imaginary_container">
+							<div class="input-group stylish-input-group">
+			                	<form class="navbar-form" action="/" method="get">
+				                    <input type="text" class="form-control"  placeholder="Movie title" name="movie_title" id="movie_title" type="text" value="${movie_title}">
+				                    <span class="input-group-addon">
+				                        <button type="submit">
+				                            <span class="glyphicon glyphicon-search"></span>
+				                        </button>  
+				                    </span>
+			                    </form>
+			                </div>
+					  </div>
                 </h1>
             </div>
         </div>
@@ -119,17 +127,33 @@
 						<c:choose>
 							<c:when test="${not movie.subscribed}">
 				                <h3>
-				                <form action="/" method="post">
-				                	<input type="hidden" name="title" value="${movie.title}" />
-				                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
-				                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
-								    <button type="submit" value="Submit">Subscribe</button>
-								</form>
+				                <c:choose>
+					                <c:when test="${user != null}">
+						                <form action="/" method="post">
+						                	<input type="hidden" name="movie_title" value="${movie_title}" />
+						                	<input type="hidden" name="title" value="${movie.title}" />
+						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
+						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+						                	<input type="hidden" name="subscribed" value="false" />
+										    <button type="submit" value="Submit" class="btn btn-success btn-lg" style="width:200px">Subscribe</button>
+										</form>
+									</c:when>
+									<c:otherwise>
+										    <a href="${loginUrl }" class="btn btn-success btn-lg" style="width:200px"> Subscribe </a>
+									</c:otherwise>
+								</c:choose>
 				                </h3>
 				            </c:when>
 				            <c:otherwise>
 				            	<h3>
-				                <a href="#">Unsubscribe</a>
+				            	<form action="/" method="post">
+						                	<input type="hidden" name="movie_title" value="${movie_title}" />
+						                	<input type="hidden" name="title" value="${movie.title}" />
+						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
+						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+						                	<input type="hidden" name="subscribed" value="true" />
+				                			<button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:200px">Unsubscribe</button>
+										</form>
 				                </h3>
 				            </c:otherwise>
 				        </c:choose>
