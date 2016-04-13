@@ -34,6 +34,16 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    
+    <script>
+	function validateForm() {
+	    var x = document.forms["search-form"]["movie_title"].value;
+	    if (x == null || x == "") {
+	        alert("Please enter a movie title!");
+	        return false;
+	    }
+	}
+	</script>
 
 </head>
 
@@ -58,7 +68,10 @@
                         <c:choose>
 							<c:when test="${user != null}">
 							<li>
-								<a href="#" style="color:#FFF;">Welcome, ${user.email}!</a>
+								<a href="#" style="color:#FFF;">${user.email}</a>
+							</li>
+							<li>
+								<a href="http://lighthouse-1243.appspot.com/subscriptions" style="color:#FFF;">My Subscriptions</a>
 							</li>
 							<li>
 								<a href="${logoutUrl}" style="color:#FFF;">Sign Out</a>.
@@ -88,7 +101,7 @@
                 	<h4>Subscribe to the movies you want to be reminded about before they're out!</h4>
 		            <div id="imaginary_container">
 							<div class="input-group stylish-input-group">
-			                	<form class="navbar-form" action="/" method="get">
+			                	<form class="search-form" action="/" method="get">
 				                    <input type="text" class="form-control"  placeholder="Movie title" name="movie_title" id="movie_title" type="text" value="${movie_title}">
 				                    <span class="input-group-addon">
 				                        <button type="submit">
