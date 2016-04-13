@@ -103,6 +103,13 @@
         </div>
         <!-- /.row -->
 
+	<c:if test="${(not (empty movie_title)) and (empty searchResults)}">
+		<h2>No movies found :(</h2>
+		<p>
+			Try checking your spelling.
+		</p>
+	</c:if>
+	
 	<c:forEach items="${searchResults}" var="movie" varStatus="loop">
 	        <c:if test="${loop.first or loop.index % 3 == 0}"> 
 	        <!-- Projects Row -->

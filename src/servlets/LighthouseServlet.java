@@ -46,6 +46,12 @@ import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 
 @SuppressWarnings("serial")
 public class LighthouseServlet extends HttpServlet {	
+	
+	private static final String THEMOVIEDB_BASE_URL = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=";
+	private static final String MOVIE_IMG_BASE_URL = "http://image.tmdb.org/t/p/w500/";
+	private static final String PLACEHOLDER_IMG_URL = "https://placehold.it/200x300?text=Movie";
+	private static final String CHAR_ENCODING = "UTF-8";
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		
 		/* 
@@ -87,16 +93,13 @@ public class LighthouseServlet extends HttpServlet {
 		}
 		
 	 	if (movieTitle != null && movieTitle != ""){		
-			//encode movie title for API call
-	 		movieTitle = java.net.URLEncoder.encode(movieTitle, "UTF-8");
-	 		
 			try {
 				searchResults = this.getMovies(movieTitle, user);
 			} catch (ParseException | SQLException e) {
 				e.printStackTrace();
 			}
 			//decode so search bar shows correct string
-			movieTitle = java.net.URLDecoder.decode(movieTitle, "UTF-8");
+			movieTitle = java.net.URLDecoder.decode(movieTitle, CHAR_ENCODING);
 		}
 		
 		req.setAttribute("searchResults", searchResults);
@@ -154,7 +157,7 @@ public class LighthouseServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect("/?movie_title=" + java.net.URLEncoder.encode(searchTitle, "UTF-8"));
+		resp.sendRedirect("/?movie_title=" + java.net.URLEncoder.encode(searchTitle, CHAR_ENCODING));
 	}
 	
 	 private ArrayList<Movie> getMovies(String title, User user) throws MalformedURLException, IOException, ParseException, SQLException{
@@ -170,10 +173,12 @@ public class LighthouseServlet extends HttpServlet {
 			 * Return:			Arraylist of Movie objects for search results
 			 * */
 		 
-		 ArrayList<Movie> movieList = new ArrayList<Movie>();
-		 	
+		 	ArrayList<Movie> movieList = new ArrayList<Movie>();
+			//encode movie title for API call
+	 		title = java.net.URLEncoder.encode(title, CHAR_ENCODING);
+	 		
 		 	//Base URL for TheMovieDB API's movie search, append title to this
-	    	String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=" + title;
+	    	String url = THEMOVIEDB_BASE_URL + title;
 	        String json = IOUtils.toString(new URL(url));
 	        JsonParser parser = new JsonParser();
 
@@ -204,17 +209,17 @@ public class LighthouseServlet extends HttpServlet {
 	                
 	                if (!dataset.get("poster_path").isJsonNull()){
 	                	imgUrl = dataset.get("poster_path").getAsString();
-	                	imgUrl = "http://image.tmdb.org/t/p/w500/" + imgUrl;
+	                	imgUrl = MOVIE_IMG_BASE_URL + imgUrl;
 	                }
 	                else
-	                	imgUrl = "https://placehold.it/200x300?text=Movie"; //no img found
+	                	imgUrl = PLACEHOLDER_IMG_URL; //no img found
 	                
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
 
 	                if (user != null && subscriptions.contains(movie)) {
 	                	movie.subscribed = true;
 	                } else {
-	                	movie.subscribed = false;	                	
+	                	movie.subscribed = false;
 	                }
 
 	                movieList.add(movie);
