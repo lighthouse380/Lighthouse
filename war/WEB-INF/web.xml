@@ -35,6 +35,17 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/dailyemails</url-pattern>
 	</servlet-mapping>
 	
+	<!-- Mapping for Subscriptions servlet -->
+	<servlet>
+		<servlet-name>Subscriptions</servlet-name>
+		<servlet-class>servlets.SubscriptionServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Subscriptions</servlet-name>
+		<url-pattern>/subscriptions</url-pattern>
+	</servlet-mapping>
+	
+	
     <!-- Prevents non-admin users from triggering reminder emails. -->
 	<security-constraint>
 		<web-resource-collection>
