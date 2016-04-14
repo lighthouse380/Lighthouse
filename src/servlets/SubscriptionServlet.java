@@ -47,7 +47,15 @@ import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 public class SubscriptionServlet extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)throws IOException, ServletException {
 
-
+		/* 
+		 * Method Name:		doGet()
+		 * Author:			Khajag Basmajian and Sevan Gregorian
+		 * Date Created:	04-14-2016
+		 * Purpose:			Loads attributes of subscriptions.jsp and sends the page to the browser. 
+		 * Input: 			HTTP request and response which include attributes 
+		 * Return:			method is void, but produces the jsp page.			
+		 * */
+		
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
 
@@ -76,8 +84,11 @@ public class SubscriptionServlet extends HttpServlet {
 			e1.printStackTrace();
 		}
 		
+		// Load the users subscribed movies from DB. 
 		if (user != null) {
 			try {
+				// GetMovieIMG adds all the images of the movies to the array because 
+				// the are not being stored in the DB
 				subscribedMovies = this.getMovieImg(DatabaseHandler.getListofSubscriptions(user.getEmail()));
 			} catch (ParseException | SQLException e) {
 				e.printStackTrace();
@@ -91,6 +102,7 @@ public class SubscriptionServlet extends HttpServlet {
 
 		resp.setContentType("text/html");
 
+		// Send req to subscriptions.jsp
 		RequestDispatcher jsp = req.getRequestDispatcher("/WEB-INF/subscriptions.jsp");
 		jsp.forward(req, resp);
 	}
@@ -99,10 +111,10 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 		
 		/* 
 		 * Method Name:		doPost()
-		 * Author:			Harout Grigoryan
-		 * Date Created:	03-16-2016
-		 * Purpose:			Take homepage's POST requests which include subscribing/unsubscribing
-		 * 					then use DatabaseHandler to update the DB accordingly.
+		 * Author:			Khajag Basmajian
+		 * Date Created:	04-14-2016
+		 * Purpose:			Take homepage's POST requests which is for unsubscribing 
+		 * 					from movies in the users subscriptions list.
 		 * Input: 			HTTP request and response which include attributes
 		 * 					(such as the movie's information for subscribing)
 		 * Return:			method is void, redirects to the doGet	
@@ -124,6 +136,7 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 			e.printStackTrace();
 		}
 		
+		// Get the list of subscribed movies
 		ArrayList<Movie> subscribedMovies = new ArrayList<Movie>();
 		Movie x = null;
 		try {
@@ -132,6 +145,8 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 			e.printStackTrace();
 		}
 		
+		// For each movie check if the movie the user is attempting to unsubcribe from matches
+		// a movie in the subscribed movies list
 		for(int i = 0; i < subscribedMovies.size(); i++)
 		{
 			if(subscribedMovies.get(i).getTitle().equals(movieTitle) && subscribedMovies.get(i).getReleaseDate().equals(movieDate)){
@@ -139,6 +154,7 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 			}
 		}
 		
+		// if the movie is found delete the movie
 		try {
 			if (susbcribed.equalsIgnoreCase("true") && x != null){
 				DatabaseHandler.deleteSubscription(x, userEmail);
@@ -154,7 +170,15 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 			throws MalformedURLException, IOException, ParseException,
 			SQLException {
 
-
+		/* 
+		 * Method Name:		getMovies()
+		 * Author:			Kahajag Basmajian
+		 * Date Created:	04-14-2016
+		 * Purpose:			Add the movie image to every movie in the list given.
+		 * Input: 			ArrayList of movies.
+		 * Return:			Arraylist of movies with the image urls added.
+		 * */
+		
 		for (int i = 0; i < movieList.size(); i++) {
 			
 			//encode movie title for API call
@@ -176,6 +200,7 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 
 				Movie x = movieList.get(i);
 
+				// Add the image to each movie object
 				if (!dataset.get("poster_path").isJsonNull()) {
 					String imgUrl = dataset.get("poster_path").getAsString();
 					x.setImgUrl("http://image.tmdb.org/t/p/w500/" + imgUrl);

@@ -7,7 +7,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 
 <!--
  File:          web.xml
- Author:        Harout Grigoryan and Carrick Bartle
+ Author:        Harout Grigoryan and Carrick Bartle and Khajag Basmajian
  Date Created:  03-14-16
  Purpose:       Maps URLS to servlets and jsp files; sets security constraints.
 -->

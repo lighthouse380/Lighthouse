@@ -1,9 +1,9 @@
 <!-- 
  Name: 		    	subscription.jsp
- Author:			Harout Grigoryan
- Date Created:  	03-14-2016
- Purpose:			Homepage for Lighthouse, serves for subscribing/unsubscribing,
- 					Logging in/out, and searching movies.
+ Author:			Khajag Basmajian and Sevan Gregorian
+ Date Created:  	04-13-2016
+ Purpose:			Page for list of subscriptions, servers for viewing a list 
+ 					of subscribed movies.
  -->
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
