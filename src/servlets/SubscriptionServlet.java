@@ -95,44 +95,47 @@ public class SubscriptionServlet extends HttpServlet {
 		jsp.forward(req, resp);
 	}
 
-	public void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
-
-		/*
-		 * Method Name: doPost() Author: Harout Grigoryan Date Created:
-		 * 03-16-2016 Purpose: Take homepage's POST requests which include
-		 * subscribing/unsubscribing then use DatabaseHandler to update the DB
-		 * accordingly. Input: HTTP request and response which include
-		 * attributes (such as the movie's information for subscribing) Return:
-		 * method is void, redirects to the doGet
-		 */
-
+public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		
+		/* 
+		 * Method Name:		doPost()
+		 * Author:			Harout Grigoryan
+		 * Date Created:	03-16-2016
+		 * Purpose:			Take homepage's POST requests which include subscribing/unsubscribing
+		 * 					then use DatabaseHandler to update the DB accordingly.
+		 * Input: 			HTTP request and response which include attributes
+		 * 					(such as the movie's information for subscribing)
+		 * Return:			method is void, redirects to the doGet	
+		 * */
+		
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		String userEmail = user.getEmail();
-
-		// get movie's title, image URL, subscription status, release date
-		// from client based on the movie they are unsubscribing/subscribing to
+		
+		//get movie's title, image URL, subscription status, release date
+		//from client based on the movie they are unsubscribing/subscribing to
 		String movieTitle = req.getParameter("title");
 		String movieImg = req.getParameter("imgUrl");
 		String susbcribed = req.getParameter("subscribed");
 		Date movieDate = null;
 		try {
 			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
-		} catch (ParseException e1) {
-			e1.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
 		}
 
 		Movie movie = new Movie(movieTitle, movieDate, movieImg);
 
 		try {
-			if (susbcribed.equalsIgnoreCase("true")) {
+			if (susbcribed.equalsIgnoreCase("false")){
+				DatabaseHandler.addSubscription(movie, userEmail);
+			} else {
 				DatabaseHandler.deleteSubscription(movie, userEmail);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		
 		resp.sendRedirect("/subscriptions");
 	}
 
