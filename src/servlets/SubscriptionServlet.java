@@ -119,18 +119,29 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 		String susbcribed = req.getParameter("subscribed");
 		Date movieDate = null;
 		try {
-			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
+			movieDate = this.parseDate(req.getParameter("releaseDate"), "yyyy-MM-dd");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-
-		Movie movie = new Movie(movieTitle, movieDate, movieImg);
-
+		
+		ArrayList<Movie> subscribedMovies = new ArrayList<Movie>();
+		Movie x = null;
 		try {
-			if (susbcribed.equalsIgnoreCase("false")){
-				DatabaseHandler.addSubscription(movie, userEmail);
-			} else {
-				DatabaseHandler.deleteSubscription(movie, userEmail);
+			subscribedMovies = this.getMovieImg(DatabaseHandler.getListofSubscriptions(user.getEmail()));
+		} catch (ParseException | SQLException e) {
+			e.printStackTrace();
+		}
+		
+		for(int i = 0; i < subscribedMovies.size(); i++)
+		{
+			if(subscribedMovies.get(i).getTitle().equals(movieTitle) && subscribedMovies.get(i).getReleaseDate().equals(movieDate)){
+				x = subscribedMovies.get(i);
+			}
+		}
+		
+		try {
+			if (susbcribed.equalsIgnoreCase("true") && x != null){
+				DatabaseHandler.deleteSubscription(x, userEmail);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
