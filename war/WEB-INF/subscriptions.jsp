@@ -101,7 +101,7 @@
 					<c:choose>
 						<c:when test="${movie.releaseDate gt now}">
 							<h3>
-							<form action="/" method="post">
+							<form action="/subscriptions" method="post">
 									<input type="hidden" name="title" value="${movie.title}" />
 									<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
 									<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />

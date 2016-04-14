@@ -11,15 +11,20 @@ package servlets;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.SimpleTimeZone;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
@@ -36,6 +41,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 
 @SuppressWarnings("serial")
 public class SubscriptionServlet extends HttpServlet {
@@ -72,20 +78,14 @@ public class SubscriptionServlet extends HttpServlet {
 		
 		if (user != null) {
 			try {
-				subscribedMovies = DatabaseHandler.getListofSubscriptions(user.getEmail());
-			} catch (SQLException e) {
+				subscribedMovies = this.getMovieImg(DatabaseHandler.getListofSubscriptions(user.getEmail()));
+			} catch (ParseException | SQLException e) {
 				e.printStackTrace();
 			}
+
 		}
 
-
-
-		try {
-			subscribedMovies = this.getMovieImg(subscribedMovies);
-		} catch (ParseException | SQLException e) {
-			e.printStackTrace();
-		}
-
+		
 		req.setAttribute("subscribedMovies", subscribedMovies);
 		req.setAttribute("currentTime", fmt.format(new Date()));
 
@@ -118,18 +118,15 @@ public class SubscriptionServlet extends HttpServlet {
 		String susbcribed = req.getParameter("subscribed");
 		Date movieDate = null;
 		try {
-			movieDate = this.parseDate(req.getParameter("releaseDate"),
-					"EEE MMM dd kk:mm:ss zzz yyyy");
-		} catch (ParseException e) {
-			e.printStackTrace();
+			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
+		} catch (ParseException e1) {
+			e1.printStackTrace();
 		}
 
 		Movie movie = new Movie(movieTitle, movieDate, movieImg);
 
 		try {
-			if (susbcribed.equalsIgnoreCase("false")) {
-				DatabaseHandler.addSubscription(movie, userEmail);
-			} else {
+			if (susbcribed.equalsIgnoreCase("true")) {
 				DatabaseHandler.deleteSubscription(movie, userEmail);
 			}
 		} catch (SQLException e) {
@@ -145,8 +142,12 @@ public class SubscriptionServlet extends HttpServlet {
 
 
 		for (int i = 0; i < movieList.size(); i++) {
+			
+			//encode movie title for API call
+	 		String movieTitle = java.net.URLEncoder.encode(movieList.get(i).getTitle(), "UTF-8");
+	 		
 			String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query="
-					+ movieList.get(i).title;
+					+ movieTitle;
 			String json = IOUtils.toString(new URL(url));
 			JsonParser parser = new JsonParser();
 
@@ -173,23 +174,27 @@ public class SubscriptionServlet extends HttpServlet {
 		return movieList;
 	}
 
-	private Map<String, SimpleDateFormat> hashFormatters = new HashMap<String, SimpleDateFormat>();
+	  private Map<String, SimpleDateFormat> hashFormatters = new HashMap<String, SimpleDateFormat>();
 
-	public Date parseDate(String date, String format) throws ParseException {
-		/*
-		 * Method Name: parseDate() Author: Harout Grigoryan Date Created:
-		 * 03-16-2016 Purpose: Creates Date formatted object based on given date
-		 * string Input: String with date and desired format for Date Return:
-		 * Formatted Date object
-		 */
+	    public Date parseDate(String date, String format) throws ParseException
+	    {
+			/* 
+			 * Method Name:		parseDate()
+			 * Author:			Harout Grigoryan
+			 * Date Created:	03-16-2016
+			 * Purpose:			Creates Date formatted object based on given date string
+			 * Input: 			String with date and desired format for Date
+			 * Return:			Formatted Date object
+			 * */
+	    	
+	        SimpleDateFormat formatter = hashFormatters.get(format);
 
-		SimpleDateFormat formatter = hashFormatters.get(format);
+	        if (formatter == null)
+	        {
+	            formatter = new SimpleDateFormat(format);
+	            hashFormatters.put(format, formatter);
+	        }
 
-		if (formatter == null) {
-			formatter = new SimpleDateFormat(format);
-			hashFormatters.put(format, formatter);
-		}
-
-		return formatter.parse(date);
-	}
+	        return formatter.parse(date);
+	    }
 }
