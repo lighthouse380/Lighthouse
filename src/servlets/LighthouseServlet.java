@@ -133,7 +133,7 @@ public class LighthouseServlet extends HttpServlet {
 		
 		Date movieDate = null;
 		try {
-			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
+			movieDate = Util.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -198,18 +198,17 @@ public class LighthouseServlet extends HttpServlet {
 	                Date releaseDate;
 	                
 	                if (!dateString.isEmpty())
-	                	releaseDate = this.parseDate(dateString, "yyyy-MM-dd");
+	                	releaseDate = Util.parseDate(dateString, "yyyy-MM-dd");
 	                else
-	                	releaseDate = this.parseDate("0000-00-00", "yyyy-MM-dd"); //no date found
+	                	releaseDate = Util.parseDate("0000-00-00", "yyyy-MM-dd"); //no date found
 	                
 	                if (!dataset.get("poster_path").isJsonNull()){
 	                	imgUrl = dataset.get("poster_path").getAsString();
 	                	imgUrl = "http://image.tmdb.org/t/p/w500/" + imgUrl;
-	                }
-	                else
+	                } else
 	                	imgUrl = "https://placehold.it/200x300?text=Movie"; //no img found
 	                
-	                String theMovieDBID = dataset.get("id").getAsString();
+	                String theMovieDBID = String.valueOf(dataset.get("id").getAsInt());
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl, theMovieDBID);
 
 	                if (user != null && subscriptions.contains(movie)) {
@@ -226,27 +225,5 @@ public class LighthouseServlet extends HttpServlet {
 	    
 	    
 	    
-	    private Map<String, SimpleDateFormat> hashFormatters = new HashMap<String, SimpleDateFormat>();
-
-	    public Date parseDate(String date, String format) throws ParseException
-	    {
-			/* 
-			 * Method Name:		parseDate()
-			 * Author:			Harout Grigoryan
-			 * Date Created:	03-16-2016
-			 * Purpose:			Creates Date formatted object based on given date string
-			 * Input: 			String with date and desired format for Date
-			 * Return:			Formatted Date object
-			 * */
-	    	
-	        SimpleDateFormat formatter = hashFormatters.get(format);
-
-	        if (formatter == null)
-	        {
-	            formatter = new SimpleDateFormat(format);
-	            hashFormatters.put(format, formatter);
-	        }
-
-	        return formatter.parse(date);
-	    }
+	    
 }

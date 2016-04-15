@@ -13,11 +13,12 @@ import java.util.Date;
 
 public class Movie {
 	
-	String title;
-	String imgUrl;
-	Date releaseDate;
+	private String title;
+	private String imgUrl;
+	private Date releaseDate;
+	private String theMovieDBID;
+	
 	Boolean subscribed; 
-	String theMovieDBID;
 	
 	Movie(String title, Date releaseDate, String imgUrl, String theMovieDBID) {
 		/* 

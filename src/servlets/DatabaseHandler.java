@@ -23,7 +23,7 @@ import com.google.appengine.api.utils.SystemProperty;
 
 public class DatabaseHandler {
 	
-	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
+	private static final Logger log = Logger.getLogger(DatabaseHandler.class.getName());
 
 	static final String USERNAME = "root";
 	static final String PASSWORD = "password";
@@ -312,33 +312,69 @@ public class DatabaseHandler {
 		 * Method Name: 	getallMovies()
 		 * Author:			Carrick Bartle
 		 * Date Created:	04-13-2016
-		 * Purpose:			Fetches every movie our users are subscribed to and returns them as an ArrayList.
+		 * Purpose:			Fetches every movie our users are subscribed to and returns them in an ArrayList 
+		 * 					sorted by release date.
 		 * Input: 			N/A
-		 * Return:			An ArrayList of all the movies our users are subscribed to.			
+		 * Return:			An ArrayList of all the movies our users are subscribed to sorted by release date.			
 		 * */    
-		ArrayList<Movie> movies = null;
+		ArrayList<Movie> movies = new ArrayList<>();
 		
 		// Connect to database and execute query to get all the movies.
-        PreparedStatement statement = getStatement(""); // TODO add query
+        PreparedStatement statement = getStatement("call sp_get_all_subscribed_movies()"); 
         ResultSet rs = statement.executeQuery();
 		while (rs.next()) {
-//			Movie newMovie = new Movie();
-//			movies.add(newMovie);
+			Movie newMovie = new Movie(rs.getString("title"), rs.getDate("releaseDate"), 
+									   rs.getString("imgURL"), String.valueOf(rs.getInt("movie_id"))); 
+			movies.add(newMovie);
 		}
-        
-        
-        
 		conn.close();
 		conn = null;
 		
 		return movies;
 	}
 	
+	public static void updateReleaseDate(Movie movie) throws SQLException {
+		/* 
+		 * Method Name: 	updateReleaseDate()
+		 * Author:			Carrick Bartle
+		 * Date Created:	04-14-2016
+		 * Purpose:			Updates a movie's release date with the latest one from The MovieDB.
+		 * Input: 			Movie object.
+		 * Return:			N/A			
+		 * */   
+		
+		// Convert the movie's release date into a MySQL-friendly string in the form of a date.
+    	String convertedDate = convertDate(movie.getReleaseDate());
+    	
+		// Connect to database and execute query to update the movie's release date.
+        PreparedStatement statement = getStatement("call sp_modify_release_date(?, ?)"); 
+        statement.setString(1, movie.getTheMovieDBID()); // TODO make sure this actually retrieves the right movie 
+        statement.setString(2, convertedDate);  
+        statement.executeQuery();
+		conn.close();
+		conn = null;
+	}
 	
-	// TODO delete account
-	
-	
-	
+	public static ArrayList<String> getSubscribers(Movie movie) throws SQLException {
+		/* 
+		 * Method Name: 	getSubscribers()
+		 * Author:			Carrick Bartle
+		 * Date Created:	04-14-2016
+		 * Purpose:			Fetches all the users subscribed to a given movie and returns their email addresses.
+		 * Input: 			Movie object.
+		 * Return:			An ArrayList of email addresses of users subscribed to the movie.
+		 * */   
+		ArrayList<String> subscribers = new ArrayList<>();
+        PreparedStatement statement = getStatement("call sp_get_subscribers(?)"); // TODO make sure this is the right query and parameters
+        statement.setString(1, movie.getTheMovieDBID()); 
+        ResultSet rs = statement.executeQuery();
+		conn.close();
+		conn = null;
+        while (rs.next()) {
+        	subscribers.add(rs.getString("email"));
+        }
+		return subscribers;
+	}
 	
 	
 //    public static boolean checkSubscription(Movie movie, String userEmail) throws SQLException{
