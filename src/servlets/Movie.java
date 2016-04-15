@@ -17,8 +17,9 @@ public class Movie {
 	String imgUrl;
 	Date releaseDate;
 	Boolean subscribed; 
+	String theMovieDBID;
 	
-	Movie(String title, Date releaseDate, String imgUrl) {
+	Movie(String title, Date releaseDate, String imgUrl, String theMovieDBID) {
 		/* 
 		 * Method Name:		Movie()
 		 * Author:			Carrick Bartle and Harout Grigoryan
@@ -35,6 +36,7 @@ public class Movie {
 		this.title = title;
 		this.releaseDate = releaseDate;
 		this.imgUrl = imgUrl;
+		this.theMovieDBID = theMovieDBID;  // The movie's unique identifier from The Movie Database.
 	}
 	
     @Override
@@ -69,7 +71,7 @@ public class Movie {
 		 * Return:			A boolean that returns true if both objects are Movies with the same title and 
 		 * 					release date, and false otherwise.			
 		 * */
-        if (this == obj)  // Comparing this movie object to itself.
+        if (this == obj)  // Return true if the movies being compared are the same object.
             return true;
         
         // Return false if the object is null or not the same class.
@@ -207,6 +209,16 @@ public class Movie {
 		this.subscribed = subscribed;
 	}
 
-	
+	public String getTheMovieDBID() {
+		/* 
+		 * Method Name:		getTheMovieDBID()
+		 * Author:			Carrick Bartle
+		 * Date Created:	04-13-2016
+		 * Purpose:			Returns the movie's unique ID from The MovieDB.
+		 * Input: 			N/A	
+		 * Return:			String of the movie's unique ID from The MovieDB.
+		 * */
+		return theMovieDBID;
+	}
 
 }

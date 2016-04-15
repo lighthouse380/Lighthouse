@@ -46,13 +46,25 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		</auth-constraint>
 	</security-constraint>
 
-	
-<!-- 	<servlet>
-		<servlet-name>HelloWorld</servlet-name>
-		<servlet-class>servlets.HelloWorldServlet</servlet-class>
+	<!-- Mapping for SyncJob servlet -->
+	<servlet>
+		<servlet-name>SyncJob</servlet-name>
+		<servlet-class>servlets.SyncJobServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>HelloWorld</servlet-name>
-		<url-pattern>/helloworld</url-pattern>
-	</servlet-mapping> -->
+		<servlet-name>SyncJob</servlet-name>
+		<url-pattern>/syncjob</url-pattern>
+	</servlet-mapping>
+	
+    <!-- Prevents non-admin users from running the sync job. -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>SyncJob</web-resource-name>
+			<url-pattern>/syncjob</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+
 </web-app>

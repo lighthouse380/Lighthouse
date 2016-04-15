@@ -24,12 +24,30 @@ import com.google.appengine.api.utils.SystemProperty;
 public class DatabaseHandler {
 	
 	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
-	
+
+	static final String USERNAME = "root";
+	static final String PASSWORD = "password";
+	static final String GOOGLE_URL = "jdbc:google:mysql://lighthouse-1243:lighthousedb1/LighthouseDB";
+	static final String GOOGLE_CLASS = "com.mysql.jdbc.GoogleDriver";
+	static final String LOCAL_URL = "jdbc:mysql://localhost:3306/LighthouseDB";
+
 	static Connection conn = null;
 	static String url = null;
-	static String username = "root";
-	static String password = "password";
-
+	
+	static {
+		if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
+			// Running from Google App Engine.
+			url = GOOGLE_URL;
+			try {
+				Class.forName(GOOGLE_CLASS);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		} else {
+			// Running locally.
+			url = LOCAL_URL;
+		}		
+	}
 	
 	public static PreparedStatement getStatement(String query) throws SQLException {
 		/* 
@@ -43,29 +61,15 @@ public class DatabaseHandler {
 		 * */
 		
 //		log.warning("Hello from DatabaseHandler");
-//    	System.out.println("Connecting to database...");
 		// Connect to a Lighthouse database and create a prepared statement with the given query.
-		if (conn == null) {
-			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
-				// Running from Google App Engine.
-				url = "jdbc:google:mysql://lighthouse-1243:lighthousedb1/LighthouseDB";
-				try {
-					Class.forName("com.mysql.jdbc.GoogleDriver");
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-			} else {
-				// Running locally.
-				url = "jdbc:mysql://localhost:3306/LighthouseDB";
-			}
-		    try {
-	            // Form one connection to the database.
-				conn = DriverManager.getConnection(url, username, password);
-			} catch (SQLException e) {}
-		}
     	PreparedStatement statement = null;
-//	    	System.out.println("Database connected.");
-	    statement = conn.prepareStatement(query);
+	    try {
+            // Form connection to the database.
+			conn = DriverManager.getConnection(url, USERNAME, PASSWORD);
+			statement = conn.prepareStatement(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	    return statement;
 	}
     
@@ -103,7 +107,7 @@ public class DatabaseHandler {
 		// Submit query to the database to add the given user. 
 		PreparedStatement ps = getStatement("call sp_add_user(?);");
         ps.setString(1, userEmail);
-		ps.executeQuery();
+		ps.executeQuery();			
 		conn.close();
 		conn = null;
     }
@@ -141,12 +145,13 @@ public class DatabaseHandler {
     	String convertedDate = convertDate(movie.getReleaseDate());
     	
     	// Send a query to the database to add a subscription to a movie for the user. 
-        PreparedStatement statement = getStatement("call sp_add_subscription(?, ?, ?);");
+        PreparedStatement statement = getStatement("call sp_add_subscription(?, ?, ?, ?, ?);");
         statement.setString(1, userEmail);
-        statement.setString(2, movie.getTitle());
-        statement.setString(3, convertedDate);   
+        statement.setString(2, movie.getTheMovieDBID());
+        statement.setString(3, movie.getTitle());
+        statement.setString(4, convertedDate);  
+        statement.setString(5, movie.getImgUrl());
         statement.executeQuery();
-//        System.out.println("Supposedly subscribed");
 		conn.close();
 		conn = null;
 	}
@@ -156,9 +161,9 @@ public class DatabaseHandler {
 		 * Method Name: 	getSubscriptions()
 		 * Author:			Carrick Bartle
 		 * Date Created:	04-01-2016
-		 * Purpose:			Fetches all the movies a given user is subscribed to.
+		 * Purpose:			Fetches all the movies a given user is subscribed to and returns as a HashSet.
 		 * Input: 			A string containing the user's email address.
-		 * Return:			HashSet of all the movies a given user is subscribed to
+		 * Return:			HashSet of all the movies a given user is subscribed to.
 		 * */   
 		
 		// Query the database to retrieve all the movies the user is subscribed to. 
@@ -169,8 +174,9 @@ public class DatabaseHandler {
         // Convert the results from the database into Movie objects.
 		HashSet<Movie> movies = new HashSet<>();
 		while (rs.next()) {
-			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), ""));
-//			log.warning(rs.getString("title"));
+			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), 
+								 rs.getString("imgURL"), String.valueOf(rs.getInt("movie_id")))); 
+			log.warning("this should be the movie_id: " + String.valueOf(rs.getInt("movie_id")));  // TODO remove 
 		}
 		conn.close();
 		conn = null;
@@ -182,9 +188,10 @@ public class DatabaseHandler {
 		 * Method Name: 	getListofSubscriptions()
 		 * Author:			Carrick Bartle
 		 * Date Created:	04-09-2016
-		 * Purpose:			Fetches all the movies a given user is subscribed to and returns them as an alphabetized list.
+		 * Purpose:			Fetches all the movies a given user is subscribed to and returns them as a list sorted
+		 * 					by release date.
 		 * Input: 			A string containing the user's email address.
-		 * Return:			ArrayList of all the movies a given user is subscribed to.
+		 * Return:			ArrayList of all the movies a given user is subscribed to, sorted by release date.
 		 * */   
 		
 		// Query the database to retrieve all the movies the user is subscribed to. 
@@ -195,8 +202,7 @@ public class DatabaseHandler {
         // Convert the results from the database into Movie objects.
 		ArrayList<Movie> movies = new ArrayList<>();
 		while (rs.next()) {
-			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), ""));
-//			log.warning(rs.getString("title"));
+			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), "", "")); // TODO: Change "" to rs.getString("TMDBid"))) and rs.getString("imgURL")
 		}
 		conn.close();
 		conn = null;
@@ -208,20 +214,16 @@ public class DatabaseHandler {
 		 * Method Name: 	deleteSubscription()
 		 * Author:			Carrick Bartle
 		 * Date Created:	03-31-2016
-		 * Purpose:			Deletes a subscription to a movie for a user.
+		 * Purpose:			Deletes a user's subscription.
 		 * Input: 			A movie object.
 		 * 					A string containing the user's email address.
 		 * Return:			N/A
 		 * */
-		
-		 // Convert Date to MySQL-friendly date string.
-    	String convertedDate = convertDate(movie.getReleaseDate()); 
-    	
-		// Connect to database and execute query.
-        PreparedStatement statement = getStatement("call sp_delete_subscription(?, ?, ?);");
+		    	
+		// Connect to database and execute query to remove movie from user's subscriptions.
+        PreparedStatement statement = getStatement("call sp_delete_subscription(?, ?);"); // TODO Test this
         statement.setString(1, userEmail);
-        statement.setString(2, movie.getTitle());
-        statement.setString(3, convertedDate);   
+        statement.setString(2, movie.getTheMovieDBID());    
         statement.executeQuery();
 		conn.close();
 		conn = null;
@@ -262,8 +264,7 @@ public class DatabaseHandler {
         
 		// Get all the subscribers to each movie and add alerts when a new movie is reached.
 		while (rs.next()) {
-			if (currTitle != null && !(currTitle.equals(rs.getString("title"))
-					&& currDate.equals(rs.getDate("releaseDate")))) {
+			if (currTitle != null && !(currTitle.equals(String.valueOf(rs.getInt("movie_id"))))) { // TODO make sure this works  
 //				System.out.print(currTitle);
 //				System.out.println(rs.getString("title"));
         		Alert newAlert = new Alert(currTitle, emailAddresses, currDate);
@@ -288,6 +289,38 @@ public class DatabaseHandler {
 	    return alerts;
 	}
 
+	public static ArrayList<Movie> getAllMovies() throws SQLException {
+		/* 
+		 * Method Name: 	getallMovies()
+		 * Author:			Carrick Bartle
+		 * Date Created:	04-13-2016
+		 * Purpose:			Fetches every movie our users are subscribed to and returns them as an ArrayList.
+		 * Input: 			N/A
+		 * Return:			An ArrayList of all the movies our users are subscribed to.			
+		 * */    
+		ArrayList<Movie> movies = null;
+		
+		// Connect to database and execute query to get all the movies.
+        PreparedStatement statement = getStatement(""); // TODO add query
+        ResultSet rs = statement.executeQuery();
+		while (rs.next()) {
+//			Movie newMovie = new Movie();
+//			movies.add(newMovie);
+		}
+        
+        
+        
+		conn.close();
+		conn = null;
+		
+		return movies;
+	}
+	
+	
+	// TODO delete account
+	
+	
+	
 	
 	
 //    public static boolean checkSubscription(Movie movie, String userEmail) throws SQLException{

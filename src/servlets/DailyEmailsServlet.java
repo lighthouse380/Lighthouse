@@ -33,6 +33,11 @@ import java.util.ArrayList;
 
 @SuppressWarnings("serial")
 public class DailyEmailsServlet extends HttpServlet {
+	
+	static final String LIGHTHOUSE_EMAIL = "thelighthouse380@gmail.com"; 
+	static final String LIGHTHOUSE_NAME = "Lighthouse";
+	static final String EMAIL_SUBJECT = "Lighthouse Subscription Reminder Email";
+	static final String EMAIL_TEXT = " will be released on ";
     
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException  {
 		/* 
@@ -55,7 +60,6 @@ public class DailyEmailsServlet extends HttpServlet {
 		
 		// Initialize JavaMail objects.
 //    	writer.println("Hello from DailyEmails");
-    	final String lighthouseEmail = "thelighthouse380@gmail.com"; 
 //    	final String lighthousePassword = "W45ev5`J(#M4MT]2gjn>";
     	Properties props = new Properties();
 //    	props.put("mail.smtp.auth", "true");
@@ -65,7 +69,7 @@ public class DailyEmailsServlet extends HttpServlet {
     	Session session = Session.getDefaultInstance(props, null); 
 //    			new javax.mail.Authenticator() {
 //    				protected PasswordAuthentication getPasswordAuthentication() {
-//    					return new PasswordAuthentication(lighthouseEmail, lighthousePassword); 
+//    					return new PasswordAuthentication(LIGHTHOUSE_EMAIL, lighthousePassword); 
 //    					} 
 //    				});
     	
@@ -79,9 +83,9 @@ public class DailyEmailsServlet extends HttpServlet {
     		// Prepare email message with a particular movie's title and release date.
     		try {
 	    	    Message msg = new MimeMessage(session);
-	    	    msg.setFrom(new InternetAddress(lighthouseEmail, "Lighthouse"));
-	    	    msg.setSubject("Lighthouse Subscription Reminder Email");
-	    	    msg.setText(alert.getTitle() + " will be released on " + alert.getReleaseDate());
+	    	    msg.setFrom(new InternetAddress(LIGHTHOUSE_EMAIL, LIGHTHOUSE_NAME));
+	    	    msg.setSubject(EMAIL_SUBJECT);
+	    	    msg.setText(alert.getTitle() + EMAIL_TEXT + alert.getReleaseDate());
 	    	    
 	    	    // Send the message to each subscriber to this movie.
 	    	    for (String email : alert.getEmailAddresses()) {
@@ -93,7 +97,7 @@ public class DailyEmailsServlet extends HttpServlet {
 	        	writer.println(e.toString());   
 	    	}
     	}
-    	
+    	// TODO delete old alerts
     }
     	
 

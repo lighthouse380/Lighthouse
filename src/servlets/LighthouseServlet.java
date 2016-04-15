@@ -46,6 +46,9 @@ import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 
 @SuppressWarnings("serial")
 public class LighthouseServlet extends HttpServlet {	
+	
+	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		
 		/* 
@@ -54,7 +57,7 @@ public class LighthouseServlet extends HttpServlet {
 		 * Date Created:	03-14-2016
 		 * Purpose:			Loads attributes of home.jsp and sends the page to the browser. 
 		 * Input: 			HTTP request and response which include attributes 
-		 * Return:			method is void, but produces the jsp page.			
+		 * Return:			This method is void, but produces the jsp page.			
 		 * */
 		
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
@@ -64,7 +67,6 @@ public class LighthouseServlet extends HttpServlet {
 		User user = userService.getCurrentUser();
 		String loginUrl = userService.createLoginURL("/");
 		String logoutUrl = userService.createLogoutURL("/");
-		
 		
 		ArrayList<Movie> searchResults = new ArrayList<Movie>();
 		String movieTitle = req.getParameter("movie_title");
@@ -78,12 +80,7 @@ public class LighthouseServlet extends HttpServlet {
 				DatabaseHandler.addUser(user.getEmail());
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}				
-		}
-		try {
-			DatabaseHandler.printUsers();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+			}
 		}
 		
 	 	if (movieTitle != null && movieTitle != ""){		
@@ -130,7 +127,10 @@ public class LighthouseServlet extends HttpServlet {
 		//from client based on the movie they are unsubscribing/subscribing to
 		String movieTitle = req.getParameter("title");
 		String movieImg = req.getParameter("imgUrl");
-		String susbcribed = req.getParameter("subscribed");
+		String subscribed = req.getParameter("subscribed");
+		String theMovieDBID = req.getParameter("theMovieDBID");   // TODO make sure we're getting the movie's ID (not working currently)
+		log.warning("this should be the movie_id: " + req.getParameter("theMovieDBID"));  // TODO remove, for testing only
+		
 		Date movieDate = null;
 		try {
 			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
@@ -138,14 +138,14 @@ public class LighthouseServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		Movie movie = new Movie(movieTitle, movieDate, movieImg);
+		Movie movie = new Movie(movieTitle, movieDate, movieImg, theMovieDBID);
 		
 		//Get the search entry to reload the page with the same search results
 		//after they clicked sub/unsub
 		String searchTitle = req.getParameter("movie_title");
 
 		try {
-			if (susbcribed.equalsIgnoreCase("false")){
+			if (subscribed.equalsIgnoreCase("false")){
 				DatabaseHandler.addSubscription(movie, userEmail);
 			} else {
 				DatabaseHandler.deleteSubscription(movie, userEmail);
@@ -209,18 +209,18 @@ public class LighthouseServlet extends HttpServlet {
 	                else
 	                	imgUrl = "https://placehold.it/200x300?text=Movie"; //no img found
 	                
-	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
+	                String theMovieDBID = dataset.get("id").getAsString();
+	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl, theMovieDBID);
 
 	                if (user != null && subscriptions.contains(movie)) {
 	                	movie.subscribed = true;
 	                } else {
-	                	movie.subscribed = false;	                	
+	                	movie.subscribed = false;
 	                }
 
 	                movieList.add(movie);
 	            }
 	        }
-	        
 	        return movieList;
 	    }
 	    
