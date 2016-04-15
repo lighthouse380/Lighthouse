@@ -112,6 +112,24 @@ public class DatabaseHandler {
 		conn = null;
     }
     
+    public static void deleteUser(String userEmail) throws SQLException {
+		/* 
+		 * Method Name: 	addUser()
+		 * Author:			Carrick Bartle
+		 * Date Created:	04-14-2016
+		 * Purpose:			Deletes the given user (and their subscriptions and alerts) from the Lighthouse database.
+		 * Input: 			A string containing the user's email address.
+		 * Return:			N/A	
+		 * */
+    	
+		// Submit query to the database to delete the given user. 
+		PreparedStatement ps = getStatement("call sp_delete_user(?);");
+        ps.setString(1, userEmail);
+		ps.executeQuery();			
+		conn.close();
+		conn = null;
+    }
+    
     private static String convertDate(Date javaDate) {
 		/* 
 		 * Method Name: 	convertDate()
