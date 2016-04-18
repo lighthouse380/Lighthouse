@@ -46,6 +46,9 @@ import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 
 @SuppressWarnings("serial")
 public class LighthouseServlet extends HttpServlet {	
+	
+	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		
 		/* 
@@ -133,19 +136,19 @@ public class LighthouseServlet extends HttpServlet {
 		String susbcribed = req.getParameter("subscribed");
 		Date movieDate = null;
 		try {
-			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
+			movieDate = Util.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-
-		Movie movie = new Movie(movieTitle, movieDate, movieImg);
+		String movieDBID = "12345";
+		Movie movie = new Movie(movieTitle, movieDate, movieImg, movieDBID);
 		
 		//Get the search entry to reload the page with the same search results
 		//after they clicked sub/unsub
 		String searchTitle = req.getParameter("movie_title");
 
 		try {
-			if (susbcribed.equalsIgnoreCase("false")){
+			if (susbcribed.equalsIgnoreCase("false")) {
 				DatabaseHandler.addSubscription(movie, userEmail);
 			} else {
 				DatabaseHandler.deleteSubscription(movie, userEmail);
@@ -171,7 +174,6 @@ public class LighthouseServlet extends HttpServlet {
 			 * */
 		 
 		 ArrayList<Movie> movieList = new ArrayList<Movie>();
-		 	
 		 	//Base URL for TheMovieDB API's movie search, append title to this
 	    	String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=" + title;
 	        String json = IOUtils.toString(new URL(url));
@@ -180,17 +182,14 @@ public class LighthouseServlet extends HttpServlet {
 	        //Element is the root node of the parsed JSON
 	        //Using element we can access the keys/values in the JSON
 	        JsonElement element = parser.parse(json);
-	        	        
 	        if (element.isJsonObject()) {
 	            JsonObject pages = element.getAsJsonObject();
 	            JsonArray movies = pages.getAsJsonArray("results");
-	            
 	            //Get user's subscriptions to see if they're subscribed to any of the search results
 	            HashSet<Movie> subscriptions = null;
 	            if (user != null){
             		subscriptions = DatabaseHandler.getSubscriptions(user.getEmail());
 	            }
-	            
 	            for (int i = 0; i < movies.size(); i++) {
 	                JsonObject dataset = movies.get(i).getAsJsonObject();
 	                String dateString = dataset.get("release_date").getAsString();
@@ -198,9 +197,9 @@ public class LighthouseServlet extends HttpServlet {
 	                Date releaseDate;
 	                
 	                if (!dateString.isEmpty())
-	                	releaseDate = this.parseDate(dateString, "yyyy-MM-dd");
+	                	releaseDate = Util.parseDate(dateString, "yyyy-MM-dd");
 	                else
-	                	releaseDate = this.parseDate("0000-00-00", "yyyy-MM-dd"); //no date found
+	                	releaseDate = Util.parseDate("0000-00-00", "yyyy-MM-dd"); //no date found
 	                
 	                if (!dataset.get("poster_path").isJsonNull()){
 	                	imgUrl = dataset.get("poster_path").getAsString();
@@ -208,8 +207,8 @@ public class LighthouseServlet extends HttpServlet {
 	                }
 	                else
 	                	imgUrl = "https://placehold.it/200x300?text=Movie"; //no img found
-	                
-	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
+	        		String movieDBID = dataset.get("id").getAsString();
+	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl, movieDBID);
 
 	                if (user != null && subscriptions.contains(movie)) {
 	                	movie.subscribed = true;
@@ -219,34 +218,10 @@ public class LighthouseServlet extends HttpServlet {
 
 	                movieList.add(movie);
 	            }
-	        }
+	        } 
 	        
 	        return movieList;
 	    }
 	    
 	    
-	    
-	    private Map<String, SimpleDateFormat> hashFormatters = new HashMap<String, SimpleDateFormat>();
-
-	    public Date parseDate(String date, String format) throws ParseException
-	    {
-			/* 
-			 * Method Name:		parseDate()
-			 * Author:			Harout Grigoryan
-			 * Date Created:	03-16-2016
-			 * Purpose:			Creates Date formatted object based on given date string
-			 * Input: 			String with date and desired format for Date
-			 * Return:			Formatted Date object
-			 * */
-	    	
-	        SimpleDateFormat formatter = hashFormatters.get(format);
-
-	        if (formatter == null)
-	        {
-	            formatter = new SimpleDateFormat(format);
-	            hashFormatters.put(format, formatter);
-	        }
-
-	        return formatter.parse(date);
-	    }
 }
