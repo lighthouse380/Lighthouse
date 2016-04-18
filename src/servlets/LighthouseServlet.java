@@ -135,13 +135,14 @@ public class LighthouseServlet extends HttpServlet {
 		String movieTitle = req.getParameter("title");
 		String movieImg = req.getParameter("imgUrl");
 		String susbcribed = req.getParameter("subscribed");
+		String movieDBID = req.getParameter("movieDBID");
+
 		Date movieDate = null;
 		try {
 			movieDate = Util.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		String movieDBID = "12345";
 		Movie movie = new Movie(movieTitle, movieDate, movieImg, movieDBID);
 		
 		//Get the search entry to reload the page with the same search results
@@ -197,6 +198,8 @@ public class LighthouseServlet extends HttpServlet {
 	            for (int i = 0; i < movies.size(); i++) {
 	                JsonObject dataset = movies.get(i).getAsJsonObject();
 	                String dateString = dataset.get("release_date").getAsString();
+	        		String movieDBID = dataset.get("id").getAsString();
+
 	                String imgUrl;
 	                Date releaseDate;
 	                
@@ -212,7 +215,6 @@ public class LighthouseServlet extends HttpServlet {
 	                else
 	                	imgUrl = PLACEHOLDER_IMG_URL; //no img found
 	                
-	        		String movieDBID = dataset.get("id").getAsString();
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl, movieDBID);
 
 	                if (user != null && subscriptions.contains(movie)) {

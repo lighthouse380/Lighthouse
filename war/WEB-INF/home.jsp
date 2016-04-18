@@ -68,10 +68,10 @@
                         <c:choose>
 							<c:when test="${user != null}">
 							<li>
-								<a href="#" style="color:#FFF;">${user.email}</a>
+								<a href="/accountsettings" style="color:#FFF;">${user.email}</a>
 							</li>
 							<li>
-								<a href="http://lighthouse-1243.appspot.com/subscriptions" style="color:#FFF;">My Subscriptions</a>
+								<a href="/subscriptions" style="color:#FFF;">My Subscriptions</a>
 							</li>
 							<li>
 								<a href="${logoutUrl}" style="color:#FFF;">Sign Out</a>.
@@ -154,6 +154,7 @@
 						                	<input type="hidden" name="title" value="${movie.title}" />
 						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
 						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+						                	<input type="hidden" name="movieDBID" value="${movie.movieDBID}" />
 						                	<input type="hidden" name="subscribed" value="false" />
 										    <button type="submit" value="Submit" class="btn btn-success btn-lg" style="width:200px">Subscribe</button>
 										</form>
@@ -171,6 +172,7 @@
 						                	<input type="hidden" name="title" value="${movie.title}" />
 						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
 						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+						                	<input type="hidden" name="movieDBID" value="${movie.movieDBID}" />
 						                	<input type="hidden" name="subscribed" value="true" />
 				                			<button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:200px">Unsubscribe</button>
 										</form>
