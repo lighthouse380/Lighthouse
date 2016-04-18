@@ -61,7 +61,7 @@ public class SyncJobServlet extends HttpServlet {
 		}
     	if (movies != null) {
     		for (Movie movie : movies) {
-    			String url = API_URL + movie.getTheMovieDBID() + API_KEY; // TODO make sure this actually retrieves the right movie 
+    			String url = API_URL + movie.getMovieDBID() + API_KEY; // TODO make sure this actually retrieves the right movie 
     	        String json = IOUtils.toString(new URL(url));
     	        JsonParser parser = new JsonParser();
     	        JsonElement element = parser.parse(json);
@@ -70,7 +70,7 @@ public class SyncJobServlet extends HttpServlet {
     	            JsonObject pages = element.getAsJsonObject();
     	            JsonArray idMatches = pages.getAsJsonArray("results");
     	            if (idMatches.size() > 1) {
-    	            	log.warning("More than one movie found with ID " + movie.getTheMovieDBID());
+    	            	log.warning("More than one movie found with ID " + movie.getMovieDBID());
     	            }
     	            JsonObject dataset = idMatches.get(0).getAsJsonObject();
     	            String dateString = dataset.get("release_date").getAsString();

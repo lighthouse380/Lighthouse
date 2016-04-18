@@ -165,7 +165,7 @@ public class DatabaseHandler {
     	// Send a query to the database to add a subscription to a movie for the user. 
         PreparedStatement statement = getStatement("call sp_add_subscription(?, ?, ?, ?, ?);");
         statement.setString(1, userEmail);
-        statement.setString(2, movie.getTheMovieDBID());
+        statement.setString(2, movie.getMovieDBID());
         statement.setString(3, movie.getTitle());
         statement.setString(4, convertedDate);  
         statement.setString(5, movie.getImgUrl());
@@ -174,7 +174,7 @@ public class DatabaseHandler {
 		conn = null;
 	}
 	
-	public static HashSet<Movie> getSubscriptions(String userEmail) throws SQLException {
+	public static HashSet<Movie> getSubscriptions(String userEmail) {
 		/* 
 		 * Method Name: 	getSubscriptions()
 		 * Author:			Carrick Bartle
@@ -184,20 +184,23 @@ public class DatabaseHandler {
 		 * Return:			HashSet of all the movies a given user is subscribed to.
 		 * */   
 		
-		// Query the database to retrieve all the movies the user is subscribed to. 
-        PreparedStatement statement = getStatement("call sp_get_subscriptions(?);");
-        statement.setString(1, userEmail);
-        ResultSet rs = statement.executeQuery();
-        
-        // Convert the results from the database into Movie objects.
 		HashSet<Movie> movies = new HashSet<>();
-		while (rs.next()) {
-			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), 
-								 rs.getString("imgURL"), String.valueOf(rs.getInt("movie_id")))); 
-			log.warning("this should be the movie_id: " + String.valueOf(rs.getInt("movie_id")));  // TODO remove 
+		
+			// Query the database to retrieve all the movies the user is subscribed to. 
+			try {
+	        PreparedStatement statement = getStatement("call sp_get_subscriptions(?);");
+	        statement.setString(1, userEmail);
+	        ResultSet rs = statement.executeQuery();
+	        
+	        // Convert the results from the database into Movie objects.
+			while (rs.next()) {
+				movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), rs.getString("imageURL"), String.valueOf(rs.getInt("movie_id")))); 
+			}
+			conn.close();
+			conn = null;
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-		conn.close();
-		conn = null;
         return movies;
 	}
 	
@@ -220,7 +223,7 @@ public class DatabaseHandler {
         // Convert the results from the database into Movie objects.
 		ArrayList<Movie> movies = new ArrayList<>();
 		while (rs.next()) {
-			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"), "", "")); // TODO: Change "" to rs.getString("TMDBid"))) and rs.getString("imgURL")
+			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"),  rs.getString("imageURL"), rs.getString("movie_id"))); 
 		}
 		conn.close();
 		conn = null;
@@ -241,7 +244,7 @@ public class DatabaseHandler {
 		// Connect to database and execute query to remove movie from user's subscriptions.
         PreparedStatement statement = getStatement("call sp_delete_subscription(?, ?);"); // TODO Test this
         statement.setString(1, userEmail);
-        statement.setString(2, movie.getTheMovieDBID());    
+        statement.setString(2, movie.getMovieDBID());    
         statement.executeQuery();
 		conn.close();
 		conn = null;
@@ -275,16 +278,12 @@ public class DatabaseHandler {
     		currTitle = rs.getString("title");
     		currDate = rs.getDate("releaseDate");
     		emailAddresses.add(rs.getString("email"));
-//    		System.out.println(currTitle);
-//    		System.out.println(currDate);
-//    		System.out.println(rs.getString("email"));
         }
         
 		// Get all the subscribers to each movie and add alerts when a new movie is reached.
 		while (rs.next()) {
-			if (currTitle != null && !(currTitle.equals(String.valueOf(rs.getInt("movie_id"))))) { // TODO make sure this works  
-//				System.out.print(currTitle);
-//				System.out.println(rs.getString("title"));
+			if (currTitle != null && !(currTitle.equals(rs.getString("title"))
+								  	   && currDate.equals(rs.getDate("releaseDate")))) { // TODO make sure this works  
         		Alert newAlert = new Alert(currTitle, emailAddresses, currDate);
         		alerts.add(newAlert);
         		currTitle = rs.getString("title");
@@ -324,7 +323,7 @@ public class DatabaseHandler {
         ResultSet rs = statement.executeQuery();
 		while (rs.next()) {
 			Movie newMovie = new Movie(rs.getString("title"), rs.getDate("releaseDate"), 
-									   rs.getString("imgURL"), String.valueOf(rs.getInt("movie_id"))); 
+									   rs.getString("imageURL"), String.valueOf(rs.getInt("movie_id"))); 
 			movies.add(newMovie);
 		}
 		conn.close();
@@ -348,7 +347,7 @@ public class DatabaseHandler {
     	
 		// Connect to database and execute query to update the movie's release date.
         PreparedStatement statement = getStatement("call sp_modify_release_date(?, ?)"); 
-        statement.setString(1, movie.getTheMovieDBID()); // TODO make sure this actually retrieves the right movie 
+        statement.setString(1, movie.getMovieDBID()); // TODO make sure this actually retrieves the right movie 
         statement.setString(2, convertedDate);  
         statement.executeQuery();
 		conn.close();
@@ -366,7 +365,7 @@ public class DatabaseHandler {
 		 * */   
 		ArrayList<String> subscribers = new ArrayList<>();
         PreparedStatement statement = getStatement("call sp_get_subscribers(?)"); // TODO make sure this is the right query and parameters
-        statement.setString(1, movie.getTheMovieDBID()); 
+        statement.setString(1, movie.getMovieDBID()); 
         ResultSet rs = statement.executeQuery();
 		conn.close();
 		conn = null;

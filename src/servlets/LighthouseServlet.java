@@ -57,7 +57,7 @@ public class LighthouseServlet extends HttpServlet {
 		 * Date Created:	03-14-2016
 		 * Purpose:			Loads attributes of home.jsp and sends the page to the browser. 
 		 * Input: 			HTTP request and response which include attributes 
-		 * Return:			This method is void, but produces the jsp page.			
+		 * Return:			method is void, but produces the jsp page.			
 		 * */
 		
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
@@ -67,6 +67,7 @@ public class LighthouseServlet extends HttpServlet {
 		User user = userService.getCurrentUser();
 		String loginUrl = userService.createLoginURL("/");
 		String logoutUrl = userService.createLogoutURL("/");
+		
 		
 		ArrayList<Movie> searchResults = new ArrayList<Movie>();
 		String movieTitle = req.getParameter("movie_title");
@@ -80,7 +81,12 @@ public class LighthouseServlet extends HttpServlet {
 				DatabaseHandler.addUser(user.getEmail());
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}
+			}				
+		}
+		try {
+			DatabaseHandler.printUsers();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
 		
 	 	if (movieTitle != null && movieTitle != ""){		
@@ -127,25 +133,22 @@ public class LighthouseServlet extends HttpServlet {
 		//from client based on the movie they are unsubscribing/subscribing to
 		String movieTitle = req.getParameter("title");
 		String movieImg = req.getParameter("imgUrl");
-		String subscribed = req.getParameter("subscribed");
-		String theMovieDBID = req.getParameter("theMovieDBID");   // TODO make sure we're getting the movie's ID (not working currently)
-		log.warning("this should be the movie_id: " + req.getParameter("theMovieDBID"));  // TODO remove, for testing only
-		
+		String susbcribed = req.getParameter("subscribed");
 		Date movieDate = null;
 		try {
 			movieDate = Util.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-
-		Movie movie = new Movie(movieTitle, movieDate, movieImg, theMovieDBID);
+		String movieDBID = "12345";
+		Movie movie = new Movie(movieTitle, movieDate, movieImg, movieDBID);
 		
 		//Get the search entry to reload the page with the same search results
 		//after they clicked sub/unsub
 		String searchTitle = req.getParameter("movie_title");
 
 		try {
-			if (subscribed.equalsIgnoreCase("false")){
+			if (susbcribed.equalsIgnoreCase("false")) {
 				DatabaseHandler.addSubscription(movie, userEmail);
 			} else {
 				DatabaseHandler.deleteSubscription(movie, userEmail);
@@ -171,7 +174,6 @@ public class LighthouseServlet extends HttpServlet {
 			 * */
 		 
 		 ArrayList<Movie> movieList = new ArrayList<Movie>();
-		 	
 		 	//Base URL for TheMovieDB API's movie search, append title to this
 	    	String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=" + title;
 	        String json = IOUtils.toString(new URL(url));
@@ -180,17 +182,14 @@ public class LighthouseServlet extends HttpServlet {
 	        //Element is the root node of the parsed JSON
 	        //Using element we can access the keys/values in the JSON
 	        JsonElement element = parser.parse(json);
-	        	        
 	        if (element.isJsonObject()) {
 	            JsonObject pages = element.getAsJsonObject();
 	            JsonArray movies = pages.getAsJsonArray("results");
-	            
 	            //Get user's subscriptions to see if they're subscribed to any of the search results
 	            HashSet<Movie> subscriptions = null;
 	            if (user != null){
             		subscriptions = DatabaseHandler.getSubscriptions(user.getEmail());
 	            }
-	            
 	            for (int i = 0; i < movies.size(); i++) {
 	                JsonObject dataset = movies.get(i).getAsJsonObject();
 	                String dateString = dataset.get("release_date").getAsString();
@@ -205,25 +204,24 @@ public class LighthouseServlet extends HttpServlet {
 	                if (!dataset.get("poster_path").isJsonNull()){
 	                	imgUrl = dataset.get("poster_path").getAsString();
 	                	imgUrl = "http://image.tmdb.org/t/p/w500/" + imgUrl;
-	                } else
+	                }
+	                else
 	                	imgUrl = "https://placehold.it/200x300?text=Movie"; //no img found
-	                
-	                String theMovieDBID = String.valueOf(dataset.get("id").getAsInt());
-	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl, theMovieDBID);
+	        		String movieDBID = dataset.get("id").getAsString();
+	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl, movieDBID);
 
 	                if (user != null && subscriptions.contains(movie)) {
 	                	movie.subscribed = true;
 	                } else {
-	                	movie.subscribed = false;
+	                	movie.subscribed = false;	                	
 	                }
 
 	                movieList.add(movie);
 	            }
-	        }
+	        } 
+	        
 	        return movieList;
 	    }
-	    
-	    
 	    
 	    
 }
