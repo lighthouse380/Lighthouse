@@ -7,7 +7,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 
 <!--
  File:          web.xml
- Author:        Harout Grigoryan and Carrick Bartle
+ Author:        Harout Grigoryan and Carrick Bartle and Khajag Basmajian
  Date Created:  03-14-16
  Purpose:       Maps URLS to servlets and jsp files; sets security constraints.
 -->
@@ -35,6 +35,17 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/dailyemails</url-pattern>
 	</servlet-mapping>
 	
+	<!-- Mapping for Subscriptions servlet -->
+	<servlet>
+		<servlet-name>Subscriptions</servlet-name>
+		<servlet-class>servlets.SubscriptionServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Subscriptions</servlet-name>
+		<url-pattern>/subscriptions</url-pattern>
+	</servlet-mapping>
+	
+	
     <!-- Prevents non-admin users from triggering reminder emails. -->
 	<security-constraint>
 		<web-resource-collection>
@@ -46,13 +57,25 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		</auth-constraint>
 	</security-constraint>
 
-	
-<!-- 	<servlet>
-		<servlet-name>HelloWorld</servlet-name>
-		<servlet-class>servlets.HelloWorldServlet</servlet-class>
+	<!-- Mapping for SyncJob servlet -->
+	<servlet>
+		<servlet-name>SyncJob</servlet-name>
+		<servlet-class>servlets.SyncJobServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>HelloWorld</servlet-name>
-		<url-pattern>/helloworld</url-pattern>
-	</servlet-mapping> -->
+		<servlet-name>SyncJob</servlet-name>
+		<url-pattern>/syncjob</url-pattern>
+	</servlet-mapping>
+	
+    <!-- Prevents non-admin users from running the sync job. -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>SyncJob</web-resource-name>
+			<url-pattern>/syncjob</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+
 </web-app>
