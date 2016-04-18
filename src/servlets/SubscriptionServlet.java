@@ -1,5 +1,5 @@
 /* 
- * Class: 			LighthouseServlet
+ * Class: 			SubscriptionServlet
  * Author:			Khajag Basmajian and Sevan Gregorian 
  * Date Created:	04-13-2016
  * Purpose:			Handle GET and POST requests from servlet subscriptions.jsp

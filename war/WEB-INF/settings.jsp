@@ -88,11 +88,28 @@
         </div>  
 		
 		<div class="col-md-4 portfolio-item">	               
+			
 			<h3>
-			<form action="/subscriptions" method="post">
+			<form action="/accountsettings" method="post">
 				<button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:250px">Delete Account</button>
 			</form>
-			</h3>
+			</h3>	
+			
+			<!-- Possible JQuery integration. Present to team. 
+			<a href="#popupDialog" data-rel="popup" data-position-to="window" data-transition="pop" 
+			class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-delete ui-btn-icon-left ui-btn-b" style="width:250px">Delete Account</a>
+			
+			<div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+			<div data-role="header" data-theme="a">
+			<h1>Delete Account?</h1>
+			</div>
+			<div role="main" class="ui-content">
+				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Cancel</a>
+				<button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:100px">Delete</button>
+			</div>
+			</div>
+			-->
+			
 	    </div> 
         
         <hr>

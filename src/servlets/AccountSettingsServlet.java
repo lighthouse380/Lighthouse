@@ -1,5 +1,5 @@
 /* 
- * Class: 			LighthouseServlet
+ * Class: 			AccountSettingsServlet
  * Author:			Khajag Basmajian 
  * Date Created:	04-17-2016
  * Purpose:			Handle GET and POST requests from servlet settings.jsp
@@ -96,7 +96,7 @@ public class AccountSettingsServlet extends HttpServlet {
 //			e.printStackTrace();
 //		}
 		
-		resp.sendRedirect("/");
+		resp.sendRedirect(userService.createLogoutURL("/"));
 	}
 
 }
