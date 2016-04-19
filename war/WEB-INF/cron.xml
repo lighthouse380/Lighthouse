@@ -1,26 +1,13 @@
 <?xml version= "1.0" encoding = "UTF-8"?>
-
-<!--
- * 
- * XML: 			Cron
- * Author:			Sevan Gregorian
- * Date Created:	        04-1-2016
- * Purpose:			To create an automatic daily reminder schedule
- * 
- * 
--->
-
-
 <!--
  * 
  * cron: 			cronentries
  * Author:			Sevan Gregorian and Carrick Bartle
- * Date Created:	        04-1-2016
+ * Date Created:	04-1-2016
  * 
- * dailyemails:                 Alert pattern starting every day at 11:30 until all emails are sent that day.
+ * dailyemails:     Alert pattern starting every day at 11:30 until all emails are sent that day.
  * 
- * retry:                       Every 10 minutes, if a reminder job has failed, it retries 5 times in 2.5 second intervals.
- *                              If a job cannot be completed, it skips to the next task.
+ * retry:           If a reminder job has failed, it retries 5 times in 2.5 second intervals.
  *                           
 -->
 <cronentries>
@@ -29,15 +16,21 @@
 	    <url>/dailyemails</url>
 	    <description>Mail out each day's release date reminders</description>
 	    <schedule>every day 11:30</schedule>
-	</cron>
-	
-	<cron>
-    	<url>/retry</url>
-    	<description>Retry on jsdk</description>
-	    <schedule>every 10 minutes</schedule>
+       <timezone>America/Tijuana</timezone>
 	    <retry-parameters>
 	      <min-backoff-seconds>2.5</min-backoff-seconds>
 	      <max-doublings>5</max-doublings>
 	    </retry-parameters>
   	</cron>
+  	
+	 <cron>
+	    <url>/syncjob</url>
+	    <description>Check all movies subscribed to for changes to release dates.</description>
+	    <schedule>every day 2:00</schedule>
+       <timezone>America/Tijuana</timezone>
+	    <retry-parameters>
+	      <min-backoff-seconds>2.5</min-backoff-seconds>
+	      <max-doublings>5</max-doublings>
+	    </retry-parameters>
+  	</cron>  	
 </cronentries>

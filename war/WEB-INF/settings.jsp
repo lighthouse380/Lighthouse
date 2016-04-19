@@ -38,7 +38,7 @@
 
 <body>
 
-    <!-- Navigation -->
+ <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -57,7 +57,10 @@
                         <c:choose>
 							<c:when test="${user != null}">
 							<li>
-								<a href="#" style="color:#FFF;">Welcome, ${user.email}!</a>
+								<a href="/accountsettings" style="color:#FFF;">${user.email}</a>
+							</li>
+							<li>
+								<a href="/subscriptions" style="color:#FFF;">My Subscriptions</a>
 							</li>
 							<li>
 								<a href="${logoutUrl}" style="color:#FFF;">Sign Out</a>.
@@ -65,7 +68,7 @@
 							</c:when>
 							<c:otherwise>
 								<li>
-									<c:redirect url="/"/>
+									<a href="${loginUrl }"><img src="img/btn_google_signin_light_normal_web.png" alt="Google Signin"></a>
 								</li>
 							</c:otherwise>
 						</c:choose>

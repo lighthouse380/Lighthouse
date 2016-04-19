@@ -46,6 +46,13 @@ import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 
 @SuppressWarnings("serial")
 public class LighthouseServlet extends HttpServlet {	
+	
+	private static final String THEMOVIEDB_BASE_URL = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=";
+	private static final String MOVIE_IMG_BASE_URL = "http://image.tmdb.org/t/p/w500/";
+	private static final String PLACEHOLDER_IMG_URL = "https://placehold.it/200x300?text=Movie";
+	private static final String CHAR_ENCODING = "UTF-8";
+	private static final Logger log = Logger.getLogger(LighthouseServlet.class.getName());
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		
 		/* 
@@ -87,16 +94,13 @@ public class LighthouseServlet extends HttpServlet {
 		}
 		
 	 	if (movieTitle != null && movieTitle != ""){		
-			//encode movie title for API call
-	 		movieTitle = java.net.URLEncoder.encode(movieTitle, "UTF-8");
-	 		
 			try {
 				searchResults = this.getMovies(movieTitle, user);
 			} catch (ParseException | SQLException e) {
 				e.printStackTrace();
 			}
 			//decode so search bar shows correct string
-			movieTitle = java.net.URLDecoder.decode(movieTitle, "UTF-8");
+			movieTitle = java.net.URLDecoder.decode(movieTitle, CHAR_ENCODING);
 		}
 		
 		req.setAttribute("searchResults", searchResults);
@@ -131,21 +135,22 @@ public class LighthouseServlet extends HttpServlet {
 		String movieTitle = req.getParameter("title");
 		String movieImg = req.getParameter("imgUrl");
 		String susbcribed = req.getParameter("subscribed");
+		String movieDBID = req.getParameter("movieDBID");
+
 		Date movieDate = null;
 		try {
-			movieDate = this.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
+			movieDate = Util.parseDate(req.getParameter("releaseDate"), "EEE MMM dd kk:mm:ss zzz yyyy");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-
-		Movie movie = new Movie(movieTitle, movieDate, movieImg);
+		Movie movie = new Movie(movieTitle, movieDate, movieImg, movieDBID);
 		
 		//Get the search entry to reload the page with the same search results
 		//after they clicked sub/unsub
 		String searchTitle = req.getParameter("movie_title");
 
 		try {
-			if (susbcribed.equalsIgnoreCase("false")){
+			if (susbcribed.equalsIgnoreCase("false")) {
 				DatabaseHandler.addSubscription(movie, userEmail);
 			} else {
 				DatabaseHandler.deleteSubscription(movie, userEmail);
@@ -154,7 +159,7 @@ public class LighthouseServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect("/?movie_title=" + java.net.URLEncoder.encode(searchTitle, "UTF-8"));
+		resp.sendRedirect("/?movie_title=" + java.net.URLEncoder.encode(searchTitle, CHAR_ENCODING));
 	}
 	
 	 private ArrayList<Movie> getMovies(String title, User user) throws MalformedURLException, IOException, ParseException, SQLException{
@@ -170,83 +175,60 @@ public class LighthouseServlet extends HttpServlet {
 			 * Return:			Arraylist of Movie objects for search results
 			 * */
 		 
-		 ArrayList<Movie> movieList = new ArrayList<Movie>();
-		 	
+		 	ArrayList<Movie> movieList = new ArrayList<Movie>();
+			//encode movie title for API call
+	 		title = java.net.URLEncoder.encode(title, CHAR_ENCODING);
+	 		
 		 	//Base URL for TheMovieDB API's movie search, append title to this
-	    	String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=" + title;
+	    	String url = THEMOVIEDB_BASE_URL + title;
 	        String json = IOUtils.toString(new URL(url));
 	        JsonParser parser = new JsonParser();
 
 	        //Element is the root node of the parsed JSON
 	        //Using element we can access the keys/values in the JSON
 	        JsonElement element = parser.parse(json);
-	        	        
 	        if (element.isJsonObject()) {
 	            JsonObject pages = element.getAsJsonObject();
 	            JsonArray movies = pages.getAsJsonArray("results");
-	            
 	            //Get user's subscriptions to see if they're subscribed to any of the search results
 	            HashSet<Movie> subscriptions = null;
 	            if (user != null){
             		subscriptions = DatabaseHandler.getSubscriptions(user.getEmail());
 	            }
-	            
 	            for (int i = 0; i < movies.size(); i++) {
 	                JsonObject dataset = movies.get(i).getAsJsonObject();
 	                String dateString = dataset.get("release_date").getAsString();
+	        		String movieDBID = dataset.get("id").getAsString();
+
 	                String imgUrl;
 	                Date releaseDate;
 	                
 	                if (!dateString.isEmpty())
-	                	releaseDate = this.parseDate(dateString, "yyyy-MM-dd");
+	                	releaseDate = Util.parseDate(dateString, "yyyy-MM-dd");
 	                else
-	                	releaseDate = this.parseDate("0000-00-00", "yyyy-MM-dd"); //no date found
+	                	releaseDate = Util.parseDate("0000-00-00", "yyyy-MM-dd"); //no date found
 	                
 	                if (!dataset.get("poster_path").isJsonNull()){
 	                	imgUrl = dataset.get("poster_path").getAsString();
-	                	imgUrl = "http://image.tmdb.org/t/p/w500/" + imgUrl;
+	                	imgUrl = MOVIE_IMG_BASE_URL + imgUrl;
 	                }
 	                else
-	                	imgUrl = "https://placehold.it/200x300?text=Movie"; //no img found
+	                	imgUrl = PLACEHOLDER_IMG_URL; //no img found
 	                
-	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl);
+	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl, movieDBID);
 
 	                if (user != null && subscriptions.contains(movie)) {
 	                	movie.subscribed = true;
 	                } else {
-	                	movie.subscribed = false;	                	
+	                	movie.subscribed = false;
 	                }
 
 	                movieList.add(movie);
 	            }
-	        }
+	        } 
 	        
 	        return movieList;
 	    }
 	    
 	    
-	    
-	    private Map<String, SimpleDateFormat> hashFormatters = new HashMap<String, SimpleDateFormat>();
-
-	    public Date parseDate(String date, String format) throws ParseException
-	    {
-			/* 
-			 * Method Name:		parseDate()
-			 * Author:			Harout Grigoryan
-			 * Date Created:	03-16-2016
-			 * Purpose:			Creates Date formatted object based on given date string
-			 * Input: 			String with date and desired format for Date
-			 * Return:			Formatted Date object
-			 * */
-	    	
-	        SimpleDateFormat formatter = hashFormatters.get(format);
-
-	        if (formatter == null)
-	        {
-	            formatter = new SimpleDateFormat(format);
-	            hashFormatters.put(format, formatter);
-	        }
-
-	        return formatter.parse(date);
-	    }
 }

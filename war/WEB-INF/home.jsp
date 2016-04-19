@@ -34,6 +34,16 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    
+    <script>
+	function validateForm() {
+	    var x = document.forms["search-form"]["movie_title"].value;
+	    if (x == null || x == "") {
+	        alert("Please enter a movie title!");
+	        return false;
+	    }
+	}
+	</script>
 
 </head>
 
@@ -58,7 +68,10 @@
                         <c:choose>
 							<c:when test="${user != null}">
 							<li>
-								<a href="#" style="color:#FFF;">Welcome, ${user.email}!</a>
+								<a href="/accountsettings" style="color:#FFF;">${user.email}</a>
+							</li>
+							<li>
+								<a href="/subscriptions" style="color:#FFF;">My Subscriptions</a>
 							</li>
 							<li>
 								<a href="${logoutUrl}" style="color:#FFF;">Sign Out</a>.
@@ -88,7 +101,7 @@
                 	<h4>Subscribe to the movies you want to be reminded about before they're out!</h4>
 		            <div id="imaginary_container">
 							<div class="input-group stylish-input-group">
-			                	<form class="navbar-form" action="/" method="get">
+			                	<form class="search-form" action="/" method="get">
 				                    <input type="text" class="form-control"  placeholder="Movie title" name="movie_title" id="movie_title" type="text" value="${movie_title}">
 				                    <span class="input-group-addon">
 				                        <button type="submit">
@@ -103,6 +116,13 @@
         </div>
         <!-- /.row -->
 
+	<c:if test="${(not (empty movie_title)) and (empty searchResults)}">
+		<h2>No movies found :(</h2>
+		<p>
+			Try checking your spelling.
+		</p>
+	</c:if>
+	
 	<c:forEach items="${searchResults}" var="movie" varStatus="loop">
 	        <c:if test="${loop.first or loop.index % 3 == 0}"> 
 	        <!-- Projects Row -->
@@ -134,6 +154,7 @@
 						                	<input type="hidden" name="title" value="${movie.title}" />
 						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
 						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+						                	<input type="hidden" name="movieDBID" value="${movie.movieDBID}" />
 						                	<input type="hidden" name="subscribed" value="false" />
 										    <button type="submit" value="Submit" class="btn btn-success btn-lg" style="width:200px">Subscribe</button>
 										</form>
@@ -151,6 +172,7 @@
 						                	<input type="hidden" name="title" value="${movie.title}" />
 						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
 						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+						                	<input type="hidden" name="movieDBID" value="${movie.movieDBID}" />
 						                	<input type="hidden" name="subscribed" value="true" />
 				                			<button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:200px">Unsubscribe</button>
 										</form>
