@@ -39,7 +39,7 @@
 
 <body>
 
-    <!-- Navigation -->
+     <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -58,7 +58,10 @@
                         <c:choose>
 							<c:when test="${user != null}">
 							<li>
-								<a href="#" style="color:#FFF;">Welcome, ${user.email}!</a>
+								<a href="/accountsettings" style="color:#FFF;">${user.email}</a>
+							</li>
+							<li>
+								<a href="/subscriptions" style="color:#FFF;">My Subscriptions</a>
 							</li>
 							<li>
 								<a href="${logoutUrl}" style="color:#FFF;">Sign Out</a>.
@@ -105,6 +108,7 @@
 									<input type="hidden" name="title" value="${movie.title}" />
 									<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
 									<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
+						            <input type="hidden" name="movieDBID" value="${movie.movieDBID}" />
 									<input type="hidden" name="subscribed" value="true" />
 									<button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:150px">Unsubscribe</button>
 							</form>

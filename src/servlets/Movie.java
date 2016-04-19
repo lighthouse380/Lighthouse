@@ -13,12 +13,14 @@ import java.util.Date;
 
 public class Movie {
 	
-	String title;
-	String imgUrl;
-	Date releaseDate;
+	private String title;
+	private String imgUrl;
+	private Date releaseDate;
+	private String movieDBID;
+	
 	Boolean subscribed; 
 	
-	Movie(String title, Date releaseDate, String imgUrl) {
+	Movie(String title, Date releaseDate, String imgUrl, String movieDBID) {
 		/* 
 		 * Method Name:		Movie()
 		 * Author:			Carrick Bartle and Harout Grigoryan
@@ -35,6 +37,7 @@ public class Movie {
 		this.title = title;
 		this.releaseDate = releaseDate;
 		this.imgUrl = imgUrl;
+		this.movieDBID = movieDBID;  // The movie's unique identifier from The Movie Database.
 	}
 	
     @Override
@@ -52,8 +55,7 @@ public class Movie {
     	// Compute hash code based on the title and release date. 
         final int prime = 31;
         int result = 1;
-        result = prime * result + title.hashCode();
-        result = prime * result + releaseDate.hashCode();
+        result = prime * result + movieDBID.hashCode();
         return result;
     }
 
@@ -63,13 +65,14 @@ public class Movie {
 		 * Method Name:		equals()
 		 * Author:			Carrick Bartle
 		 * Date Created:	04-02-2016
-		 * Purpose:			Overrides equals() so that different Movie objects with the same release date
-		 * 					and title evaluate to equal.
+		 * Purpose:			Overrides equals() so that different Movie objects with the same ID from The Movie DB 
+		 * 					evaluate to equal.
 		 * Input: 			An object.
-		 * Return:			A boolean that returns true if both objects are Movies with the same title and 
-		 * 					release date, and false otherwise.			
+		 * Return:			A boolean that returns true if both objects are Movies that have the same MovieDB ID 
+		 * 					and false otherwise.			
 		 * */
-        if (this == obj)  // Comparing this movie object to itself.
+    	
+        if (this == obj)  // Return true if the movies being compared are the same object.
             return true;
         
         // Return false if the object is null or not the same class.
@@ -77,10 +80,9 @@ public class Movie {
             return false;
         if (getClass() != obj.getClass()) 
             return false;
+        
         Movie otherMovie = (Movie) obj;
-        if (!title.equals(otherMovie.title))  // Check title.
-            return false;
-        if (!releaseDate.equals(otherMovie.releaseDate))  // Check release date.
+        if (!releaseDate.equals(otherMovie.getMovieDBID()))  // Check if the two movies have the same ID.
             return false;
         return true;
     }
@@ -207,6 +209,16 @@ public class Movie {
 		this.subscribed = subscribed;
 	}
 
-	
+	public String getMovieDBID() {
+		/* 
+		 * Method Name:		getTheMovieDBID()
+		 * Author:			Carrick Bartle
+		 * Date Created:	04-13-2016
+		 * Purpose:			Returns the movie's unique ID from The MovieDB.
+		 * Input: 			N/A	
+		 * Return:			String of the movie's unique ID from The MovieDB.
+		 * */
+		return movieDBID;
+	}
 
 }
