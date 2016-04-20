@@ -122,15 +122,13 @@
 					</c:choose>
 	            </div>    
 	   
-				<div class="col-md-10 col-sm-9">
+				<div class="col-md-4">
 				  <h3>${movie.title}</h3>
-				  <div class="row">
 					<div class="col-xs-9">
 					  <h4>
 					  <fmt:formatDate type="date" value="${movie.releaseDate}"/>
 					  </h4>	
 					</div>
-				  </div>
 				  <br><br>
 				</div>
 	        </div>
