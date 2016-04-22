@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.logging.Logger;
@@ -204,6 +205,7 @@ public class DatabaseHandler {
         return movies;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static ArrayList<Movie> getListofSubscriptions(String userEmail) throws SQLException {
 		/* 
 		 * Method Name: 	getListofSubscriptions()
@@ -222,8 +224,16 @@ public class DatabaseHandler {
         
         // Convert the results from the database into Movie objects.
 		ArrayList<Movie> movies = new ArrayList<>();
-		while (rs.next()) {
-			movies.add(new Movie(rs.getString("title"), rs.getDate("releaseDate"),  rs.getString("imageURL"), rs.getString("movie_id"))); 
+		while (rs.next()) {			
+			Calendar today = Calendar.getInstance();
+			today.clear(Calendar.HOUR); today.clear(Calendar.MINUTE); today.clear(Calendar.SECOND);
+			Date todaysDate = today.getTime();
+			Movie newMovie = new Movie(rs.getString("title"), rs.getDate("releaseDate"),  rs.getString("imageURL"), rs.getString("movie_id"));
+			if (rs.getDate("releaseDate").after(todaysDate)) {   // TODO finish reordering list of subscriptions
+				movies.add(0, newMovie); // Add to the head of the list.				
+			} else {
+				movies.add(newMovie);
+			}
 		}
 		conn.close();
 		conn = null;
@@ -308,7 +318,7 @@ public class DatabaseHandler {
 
 	public static ArrayList<Movie> getAllMovies() throws SQLException {
 		/* 
-		 * Method Name: 	getallMovies()
+		 * Method Name: 	getAllMovies()
 		 * Author:			Carrick Bartle
 		 * Date Created:	04-13-2016
 		 * Purpose:			Fetches every movie our users are subscribed to and returns them in an ArrayList 
@@ -320,11 +330,13 @@ public class DatabaseHandler {
 		
 		// Connect to database and execute query to get all the movies.
         PreparedStatement statement = getStatement("call sp_get_all_subscribed_movies()"); 
+//        log.warning("Hello from getAllMovies()");
         ResultSet rs = statement.executeQuery();
 		while (rs.next()) {
-			Movie newMovie = new Movie(rs.getString("title"), rs.getDate("releaseDate"), 
-									   rs.getString("imageURL"), String.valueOf(rs.getInt("movie_id"))); 
+			Movie newMovie = new Movie("", rs.getDate("releaseDate"), 
+									   "", String.valueOf(rs.getInt("movie_id"))); 
 			movies.add(newMovie);
+//			log.warning(newMovie.getMovieDBID());
 		}
 		conn.close();
 		conn = null;
@@ -347,7 +359,7 @@ public class DatabaseHandler {
     	
 		// Connect to database and execute query to update the movie's release date.
         PreparedStatement statement = getStatement("call sp_modify_release_date(?, ?)"); 
-        statement.setString(1, movie.getMovieDBID()); // TODO make sure this actually retrieves the right movie 
+        statement.setString(1, movie.getMovieDBID()); 
         statement.setString(2, convertedDate);  
         statement.executeQuery();
 		conn.close();
@@ -364,7 +376,7 @@ public class DatabaseHandler {
 		 * Return:			An ArrayList of email addresses of users subscribed to the movie.
 		 * */   
 		ArrayList<String> subscribers = new ArrayList<>();
-        PreparedStatement statement = getStatement("call sp_get_subscribers(?)"); // TODO make sure this is the right query and parameters
+        PreparedStatement statement = getStatement("call sp_get_subscribers(?)");
         statement.setString(1, movie.getMovieDBID()); 
         ResultSet rs = statement.executeQuery();
 		conn.close();
@@ -373,6 +385,22 @@ public class DatabaseHandler {
         	subscribers.add(rs.getString("email"));
         }
 		return subscribers;
+	}
+	
+	public static void deleteOldAlerts() throws SQLException {
+		/* 
+		 * Method Name: 	deleteOldAlerts()
+		 * Author:			Carrick Bartle
+		 * Date Created:	04-20-2016
+		 * Purpose:			
+		 * Input: 			
+		 * Return:			
+		 * */ 
+		
+		PreparedStatement statement = getStatement("call sp_delete_old_alerts()"); 
+        statement.executeQuery();
+		conn.close();
+		conn = null;	
 	}
 	
 	

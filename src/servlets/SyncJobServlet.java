@@ -54,6 +54,7 @@ public class SyncJobServlet extends HttpServlet {
 		 * */
 
 		ArrayList<Movie> movies = null;
+//		log.warning("Hello from SyncJob");  // This is working
     	try {
 			movies = DatabaseHandler.getAllMovies();
 		} catch (SQLException e) {
@@ -61,19 +62,16 @@ public class SyncJobServlet extends HttpServlet {
 		}
     	if (movies != null) {
     		for (Movie movie : movies) {
-    			String url = API_URL + movie.getMovieDBID() + API_KEY; // TODO make sure this actually retrieves the right movie 
+    			String url = API_URL + movie.getMovieDBID() + API_KEY; 
+//    			log.warning(url);
     	        String json = IOUtils.toString(new URL(url));
     	        JsonParser parser = new JsonParser();
     	        JsonElement element = parser.parse(json);
     	        
     	        if (element.isJsonObject()) {
     	            JsonObject pages = element.getAsJsonObject();
-    	            JsonArray idMatches = pages.getAsJsonArray("results");
-    	            if (idMatches.size() > 1) {
-    	            	log.warning("More than one movie found with ID " + movie.getMovieDBID());
-    	            }
-    	            JsonObject dataset = idMatches.get(0).getAsJsonObject();
-    	            String dateString = dataset.get("release_date").getAsString();
+    	            String dateString = pages.get("release_date").getAsString();
+    	            log.warning("release date:" + dateString);
 	                Date releaseDate = null;
 	                
 	                if (!dateString.isEmpty()) {
@@ -89,19 +87,21 @@ public class SyncJobServlet extends HttpServlet {
 							e.printStackTrace();
 						} 
 	                }
+	                if (releaseDate == null) {
+	                	log.warning("Something went wrong with the release date");
+	                } else {
+	                	log.warning(releaseDate.toString());
+	                }
 	                if (releaseDate != null && !releaseDate.equals(movie.getReleaseDate())) {
+	                	log.warning("The release date is different!");
 	                	movie.setReleaseDate(releaseDate);
 	                	try {
+							DatabaseHandler.updateReleaseDate(movie);
 							mailUpdate(movie, releaseDate);
 						} catch (SQLException e1) {
 							e1.printStackTrace();
 						}
-	                	try {
-							DatabaseHandler.updateReleaseDate(movie);
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-	                }  
+    	            }
     	        }
     		}	
     	}
