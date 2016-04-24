@@ -34,6 +34,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import Utilities.DatabaseHandler;
+import Utilities.Movie;
+import Utilities.Util;
+
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -166,9 +170,9 @@ public class SearchResultsServlet extends HttpServlet {
 	                Movie movie = new Movie(dataset.get("original_title").getAsString(), releaseDate, imgUrl, movieDBID);
 
 	                if (user != null && subscriptions.contains(movie)) {
-	                	movie.subscribed = true;
+	                	movie.setSubscribed(true);
 	                } else {
-	                	movie.subscribed = false;
+	                	movie.setSubscribed(false);
 	                }
 
 	                movieList.add(movie);

@@ -5,7 +5,7 @@
  * Purpose:			Holds data pertaining to alerts (subscribers' email addresses, title, release date).
  * 
  * */
-package servlets;
+package Utilities;
 
 import java.util.ArrayList;
 import java.util.Date;

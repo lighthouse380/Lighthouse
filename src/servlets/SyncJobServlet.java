@@ -32,6 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 
+import Utilities.DatabaseHandler;
+import Utilities.Movie;
+import Utilities.Util;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -61,54 +65,66 @@ public class SyncJobServlet extends HttpServlet {
 		 * Return:			N/A			
 		 * */
 
-		ArrayList<Movie> movies = null;
+		ArrayList<Movie> movies = new ArrayList<>();
+		
+		// Fetch all movies in the database that have not already been released.
     	try {
 			movies = DatabaseHandler.getAllMovies();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-    	if (movies != null) {
-    		for (Movie movie : movies) {
-    			String url = API_URL + movie.getMovieDBID() + API_KEY; 
-    	        String json = IOUtils.toString(new URL(url));
-    	        JsonParser parser = new JsonParser();
-    	        JsonElement element = parser.parse(json);
-    	        
-    	        if (element.isJsonObject()) {
-    	            JsonObject pages = element.getAsJsonObject();
-    	            String dateString = pages.get("release_date").getAsString();
-    	            movie.setTitle(pages.get("title").getAsString());
-	                Date releaseDate = null;
-	                
-	                if (!dateString.isEmpty()) {
-						try {
-							releaseDate = Util.parseDate(dateString, "yyyy-MM-dd");
-						} catch (ParseException e) {
-							e.printStackTrace();
+    	
+		for (Movie movie : movies) {
+			
+			// API call to fetch info for a particular movie.
+			String url = API_URL + movie.getMovieDBID() + API_KEY;
+			
+			// Get the release date from the json object returned from the API call.
+	        String json = IOUtils.toString(new URL(url));
+	        JsonParser parser = new JsonParser();
+	        JsonElement element = parser.parse(json);
+	        
+	        if (element.isJsonObject()) {
+	            JsonObject pages = element.getAsJsonObject();
+	            String dateString = pages.get("release_date").getAsString();
+	            movie.setTitle(pages.get("title").getAsString());
+                Date releaseDate = null;
+                
+                // Parse the release date returned in the json object.
+                if (!dateString.isEmpty()) {
+					try {
+						releaseDate = Util.parseDate(dateString, "yyyy-MM-dd");
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+                } else { // This movie has not been given a release date.
+					try {
+						releaseDate = Util.parseDate("0000-00-00", "yyyy-MM-dd");
+					} catch (ParseException e) {
+						e.printStackTrace();
+					} 
+                }
+                if (releaseDate == null) {
+                	log.warning("Something went wrong with the release date.");
+                } else {
+                	
+                	// Release date at The MovieDB is different from the one in our database.
+	                if (!releaseDate.equals(movie.getReleaseDate())) {
+	                	
+	                	// Change our database to reflect the new release date.
+	                	Date oldDate = movie.getReleaseDate();
+	                	movie.setReleaseDate(releaseDate);  
+	                	try {
+							DatabaseHandler.updateReleaseDate(movie);
+							
+							// Send an email to all subscribers to this movie informing them of the change.
+							mailUpdate(movie, oldDate);
+						} catch (SQLException e1) {
+							e1.printStackTrace();
 						}
-	                } else { // This movie has not been given a release date.
-						try {
-							releaseDate = Util.parseDate("0000-00-00", "yyyy-MM-dd");
-						} catch (ParseException e) {
-							e.printStackTrace();
-						} 
 	                }
-	                if (releaseDate == null) {
-	                	log.warning("Something went wrong with the release date.");
-	                } else {
-		                if (!releaseDate.equals(movie.getReleaseDate())) {
-		                	Date oldDate = movie.getReleaseDate();
-		                	movie.setReleaseDate(releaseDate);
-		                	try {
-								DatabaseHandler.updateReleaseDate(movie);
-								mailUpdate(movie, oldDate);
-							} catch (SQLException e1) {
-								e1.printStackTrace();
-							}
-		                }
-    	            }
-    	        }
-    		}	
+	            }
+	        }
     	}
     	
     }
@@ -125,13 +141,16 @@ public class SyncJobServlet extends HttpServlet {
 		 * Input: 			Movie object, the movie's old release date as a java.util.Date 
 		 * Return:			N/A			
 		 * */
+    	
+    	// Fetch all subscribers to a particular movie from the database.
     	ArrayList<String> subscribers = DatabaseHandler.getSubscribers(movie);
-    	log.warning(String.valueOf(subscribers.size()));
+    	
     	Properties props = new Properties();
     	Session session = Session.getDefaultInstance(props, null); 
     	for (String subscriber : subscribers) {
-    		log.warning(subscriber);
     		try {
+    			
+    			// Populate an email with subject, text, email address.
 	    	    Message msg = new MimeMessage(session);
 	    	    msg.setFrom(new InternetAddress(LIGHTHOUSE_EMAIL, LIGHTHOUSE_NAME));
 	    	    msg.setSubject(EMAIL_SUBJECT);

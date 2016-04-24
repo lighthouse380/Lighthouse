@@ -5,7 +5,7 @@
  * Purpose:			Holds information about a movie and enables a user to subscribe to and unsubscribe from it.
  * 
  * */
-package servlets;
+package Utilities;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -20,7 +20,7 @@ public class Movie {
 	
 	Boolean subscribed; 
 	
-	Movie(String title, Date releaseDate, String imgUrl, String movieDBID) {
+	public Movie(String title, Date releaseDate, String imgUrl, String movieDBID) {
 		/* 
 		 * Method Name:		Movie()
 		 * Author:			Carrick Bartle and Harout Grigoryan

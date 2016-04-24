@@ -6,7 +6,7 @@
  * 					for processing.
  * 
  * */
-package servlets;
+package Utilities;
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -212,10 +212,10 @@ public class DatabaseHandler {
 			today.clear(Calendar.HOUR); today.clear(Calendar.MINUTE); today.clear(Calendar.SECOND);
 			Date todaysDate = today.getTime();
 			Movie newMovie = new Movie(rs.getString("title"), rs.getDate("releaseDate"),  rs.getString("imageURL"), rs.getString("movie_id"));
-			if (rs.getDate("releaseDate").after(todaysDate)) {   // TODO finish reordering list of subscriptions
-				movies.add(0, newMovie); // Add to the head of the list.				
+			if (rs.getDate("releaseDate").after(todaysDate)) {   
+				movies.add(0, newMovie); // Add unreleased movies to the head of the list (ascending chronological order).
 			} else {
-				movies.add(newMovie);
+				movies.add(newMovie); // Add released movies to the end of the list (descending chronological order).
 			}
 		}
 		conn.close();
@@ -235,7 +235,7 @@ public class DatabaseHandler {
 		 * */
 		    	
 		// Connect to database and execute query to remove movie from user's subscriptions.
-        PreparedStatement statement = getStatement("call sp_delete_subscription(?, ?);"); // TODO Test this
+        PreparedStatement statement = getStatement("call sp_delete_subscription(?, ?);"); 
         statement.setString(1, userEmail);
         statement.setString(2, movie.getMovieDBID());    
         statement.executeQuery();
@@ -312,6 +312,8 @@ public class DatabaseHandler {
         PreparedStatement statement = getStatement("call sp_get_all_subscribed_movies()"); 
         ResultSet rs = statement.executeQuery();
 		while (rs.next()) {
+			
+			// Convert results from database into Movie objects.
 			Movie newMovie = new Movie("", rs.getDate("releaseDate"), 
 									   "", String.valueOf(rs.getInt("movie_id"))); 
 			movies.add(newMovie);
@@ -354,9 +356,13 @@ public class DatabaseHandler {
 		 * Return:			An ArrayList of email addresses of users subscribed to the movie.
 		 * */   
 		ArrayList<String> subscribers = new ArrayList<>();
+		
+		// Fetch email addresses from the database.
         PreparedStatement statement = getStatement("call sp_get_movie_subscribers(?)");
         statement.setString(1, movie.getMovieDBID()); 
         ResultSet rs = statement.executeQuery();
+        
+        // Add each email address to an ArrayList.
         while (rs.next()) {
         	subscribers.add(rs.getString("email"));
         }
@@ -370,11 +376,12 @@ public class DatabaseHandler {
 		 * Method Name: 	deleteOldAlerts()
 		 * Author:			Carrick Bartle
 		 * Date Created:	04-20-2016
-		 * Purpose:			
-		 * Input: 			
-		 * Return:			
+		 * Purpose:			Deletes all old alerts from the database.
+		 * Input: 			N/A
+		 * Return:			N/A
 		 * */ 
 		
+		// Trigger the database's stored procedure to delete any alerts scheduled for before today.
 		PreparedStatement statement = getStatement("call sp_delete_old_alerts()"); 
         statement.executeQuery();
 		conn.close();
