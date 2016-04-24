@@ -62,7 +62,6 @@ public class SyncJobServlet extends HttpServlet {
 		 * */
 
 		ArrayList<Movie> movies = null;
-//		log.warning("Hello from SyncJob");  // This is working
     	try {
 			movies = DatabaseHandler.getAllMovies();
 		} catch (SQLException e) {
@@ -71,7 +70,6 @@ public class SyncJobServlet extends HttpServlet {
     	if (movies != null) {
     		for (Movie movie : movies) {
     			String url = API_URL + movie.getMovieDBID() + API_KEY; 
-//    			log.warning(url);
     	        String json = IOUtils.toString(new URL(url));
     	        JsonParser parser = new JsonParser();
     	        JsonElement element = parser.parse(json);
@@ -80,8 +78,6 @@ public class SyncJobServlet extends HttpServlet {
     	            JsonObject pages = element.getAsJsonObject();
     	            String dateString = pages.get("release_date").getAsString();
     	            movie.setTitle(pages.get("title").getAsString());
-//    	            log.warning(pages.get("title").getAsString());
-//    	            log.warning("Database release date:" + movie.getReleaseDate());
 	                Date releaseDate = null;
 	                
 	                if (!dateString.isEmpty()) {
@@ -100,10 +96,8 @@ public class SyncJobServlet extends HttpServlet {
 	                if (releaseDate == null) {
 	                	log.warning("Something went wrong with the release date.");
 	                } else {
-//	                	log.warning(releaseDate.toString());
 		                if (!releaseDate.equals(movie.getReleaseDate())) {
 		                	Date oldDate = movie.getReleaseDate();
-//		                	log.warning("The release date is different!");
 		                	movie.setReleaseDate(releaseDate);
 		                	try {
 								DatabaseHandler.updateReleaseDate(movie);
@@ -141,7 +135,6 @@ public class SyncJobServlet extends HttpServlet {
 	    	    Message msg = new MimeMessage(session);
 	    	    msg.setFrom(new InternetAddress(LIGHTHOUSE_EMAIL, LIGHTHOUSE_NAME));
 	    	    msg.setSubject(EMAIL_SUBJECT);
-	    	    log.warning("This should be the title: " + movie.getTitle());
 	    	    String oldDateStr = Util.convertDate(oldDate);
 	    	    String newDateStr = Util.convertDate(movie.getReleaseDate());
 	    	    msg.setText(movie.getTitle() + EMAIL_TEXT + oldDateStr + TO + newDateStr + ".");

@@ -61,7 +61,6 @@ public class DatabaseHandler {
 		 * Return:			A PreparedStatement for the query that can then be executed.			
 		 * */
 		
-//		log.warning("Hello from DatabaseHandler");
 		// Connect to a Lighthouse database and create a prepared statement with the given query.
     	PreparedStatement statement = null;
 	    try {
@@ -283,11 +282,8 @@ public class DatabaseHandler {
         		currTitle = rs.getString("title");
         		currDate = rs.getDate("releaseDate");
         		emailAddresses = new ArrayList<>();
-//        		System.out.println(currTitle);
-//        		System.out.println(currDate);
         	} 
         	emailAddresses.add(rs.getString("email"));
-//    		System.out.println(rs.getString("email"));
 		}
 		
 		// Reached the end of the results. Add the final alert.
@@ -314,13 +310,11 @@ public class DatabaseHandler {
 		
 		// Connect to database and execute query to get all the movies.
         PreparedStatement statement = getStatement("call sp_get_all_subscribed_movies()"); 
-//        log.warning("Hello from getAllMovies()");
         ResultSet rs = statement.executeQuery();
 		while (rs.next()) {
 			Movie newMovie = new Movie("", rs.getDate("releaseDate"), 
 									   "", String.valueOf(rs.getInt("movie_id"))); 
 			movies.add(newMovie);
-//			log.warning(newMovie.getMovieDBID());
 		}
 		conn.close();
 		conn = null;
@@ -359,16 +353,11 @@ public class DatabaseHandler {
 		 * Input: 			Movie object.
 		 * Return:			An ArrayList of email addresses of users subscribed to the movie.
 		 * */   
-		log.warning("Hello from getSubscribers()");
 		ArrayList<String> subscribers = new ArrayList<>();
         PreparedStatement statement = getStatement("call sp_get_movie_subscribers(?)");
         statement.setString(1, movie.getMovieDBID()); 
         ResultSet rs = statement.executeQuery();
-        if (rs == null) {
-        	log.warning("rs is null");
-        }
         while (rs.next()) {
-        	log.warning(rs.getString("email"));
         	subscribers.add(rs.getString("email"));
         }
         conn.close();
@@ -391,28 +380,5 @@ public class DatabaseHandler {
 		conn.close();
 		conn = null;	
 	}
-	
-	
-//    public static boolean checkSubscription(Movie movie, String userEmail) throws SQLException{
-//    	boolean subscribed = false;
-////	    System.out.println("Java date:" + movie.getReleaseDate());
-//    	String convertedDate = convertDate(movie.getReleaseDate());
-////	   	System.out.println("MySQL date:" + convertedDate);
-//        PreparedStatement statement = getStatement("SELECT fn_check_subscription(?, ?, ?);");
-//        statement.setString(1, userEmail);
-//        statement.setString(2, movie.getTitle());
-//        statement.setString(3, convertedDate);
-//        ResultSet rs = statement.executeQuery();
-//        if (rs.next()) {
-//        	if (rs.getBoolean(1)) {
-//        		subscribed = true;
-//        		//System.out.println("Subscribed");
-//        	} else {
-//        		//System.out.println("Not subscribed");
-//        	}
-//	    } else {
-//	    	System.out.println("Subscription information not found.");
-//	    }
-//    	return subscribed;
-//    }
+
 }
