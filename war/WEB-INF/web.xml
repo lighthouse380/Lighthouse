@@ -45,6 +45,16 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/subscriptions</url-pattern>
 	</servlet-mapping>
 	
+		<!-- Mapping for Search Results servlet -->
+	<servlet>
+		<servlet-name>SearchResults</servlet-name>
+		<servlet-class>servlets.SearchResultsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SearchResults</servlet-name>
+		<url-pattern>/searchresults</url-pattern>
+	</servlet-mapping>
+	
 	<!-- Mapping for Settings servlet -->
 	<servlet>
 		<servlet-name>AccountSettings</servlet-name>

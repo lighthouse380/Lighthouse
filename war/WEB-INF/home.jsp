@@ -1,3 +1,9 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<html lang="en">
+
 <!-- 
  Name: 		    	home.jsp
  Author:			Harout Grigoryan
@@ -5,13 +11,7 @@
  Purpose:			Homepage for Lighthouse, serves for subscribing/unsubscribing,
  					Logging in/out, and searching movies.
  -->
-
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
-<html lang="en">
-
+ 
 <head>
 
     <meta charset="utf-8">
@@ -35,15 +35,66 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
     
-    <script>
-	function validateForm() {
-	    var x = document.forms["search-form"]["movie_title"].value;
-	    if (x == null || x == "") {
-	        alert("Please enter a movie title!");
-	        return false;
-	    }
-	}
-	</script>
+    
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+	<script src="http://code.jquery.com/jquery.min.js"></script>
+	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    
+    <script type="text/javascript">
+    function validateForm() {
+    	  var x = document.forms["search-form"]["movie_title"].value;
+    	  if (x == null || x == "") {
+    	    alert("Please enter a movie title!");
+    	    return false;
+    	  }
+    	}
+
+    	var movieFunc = function(e) {
+    	  e.preventDefault();
+    	  var button = $(this);
+    	  var form = $(this.form);
+    	  var form_data = form.serialize();
+    	  var form_method = form.attr("method").toUpperCase();
+    	  if (form_method != 'POST') {
+    	    return false;
+    	  }
+
+    	  console.log(button);
+    	  $.ajax({
+    	    url: "/",
+    	    type: form_method,
+    	    data: form_data,
+    	    success: function() {
+    	      button.button('complete');
+    	      console.log('end of subscribe...\n');
+    	    }
+    	  });
+    	};
+
+    	  $(document).ready(function() {
+
+    	    $("form[ajax=true]").submit(function(e) {
+    	      e.preventDefault();
+    	      var form_data = $(this).serialize();
+    	      var form_url = $(this).attr("action");
+    	      var form_method = $(this).attr("method").toUpperCase();
+
+    	      console.log("search starting\n");
+    	      $.ajax({
+    	        type: form_method,
+    	        url: form_url,
+    	        data: form_data,
+    	        dataType: "html",
+    	        success: function(results) {
+    	          $("#searchResults").html(results);
+    	          $(".movie").click(movieFunc);
+    	          return false;
+    	        },
+    	        error: console.log("error")
+    	      });
+    	    });
+    	  });
+    </script>
 
 </head>
 
@@ -101,10 +152,10 @@
                 	<h4>Subscribe to the movies you want to be reminded about before they're out!</h4>
 		            <div id="imaginary_container">
 							<div class="input-group stylish-input-group">
-			                	<form class="search-form" action="/" method="get">
+			                	<form method="get" action="/searchresults" ajax="true">
 				                    <input type="text" class="form-control"  placeholder="Movie title" name="movie_title" id="movie_title" type="text" value="${movie_title}">
 				                    <span class="input-group-addon">
-				                        <button type="submit">
+				                        <button type="button" value="Submit">
 				                            <span class="glyphicon glyphicon-search"></span>
 				                        </button>  
 				                    </span>
@@ -115,84 +166,9 @@
             </div>
         </div>
         <!-- /.row -->
+<div id="searchResults">
 
-	<c:if test="${(not (empty movie_title)) and (empty searchResults)}">
-		<h2>No movies found :(</h2>
-		<p>
-			Try checking your spelling.
-		</p>
-	</c:if>
-	
-	<c:forEach items="${searchResults}" var="movie" varStatus="loop">
-	        <c:if test="${loop.first or loop.index % 3 == 0}"> 
-	        <!-- Projects Row -->
-	        <div class="row">
-	        </c:if>
-	            <div class="col-md-4 portfolio-item">
-	                <img src="${movie.imgUrl}" style="height:300px;">
-
-	                <h2>
-	                    ${movie.title}
-	                </h2>
-	                <h3>
-	                	<fmt:formatDate type="date" value="${movie.releaseDate}" />
-	                </h3>
-	                
-	                
-	                
-	      <!--  if release date is after current date -->
-	         <jsp:useBean id="now" class="java.util.Date"/>
-		         <c:choose>
-					<c:when test="${movie.releaseDate gt now}">
-						<c:choose>
-							<c:when test="${not movie.subscribed}">
-				                <h3>
-				                <c:choose>
-					                <c:when test="${user != null}">
-						                <form action="/" method="post">
-						                	<input type="hidden" name="movie_title" value="${movie_title}" />
-						                	<input type="hidden" name="title" value="${movie.title}" />
-						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
-						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
-						                	<input type="hidden" name="movieDBID" value="${movie.movieDBID}" />
-						                	<input type="hidden" name="subscribed" value="false" />
-										    <button type="submit" value="Submit" class="btn btn-success btn-lg" style="width:200px">Subscribe</button>
-										</form>
-									</c:when>
-									<c:otherwise>
-										    <a href="${loginUrl }" class="btn btn-success btn-lg" style="width:200px"> Subscribe </a>
-									</c:otherwise>
-								</c:choose>
-				                </h3>
-				            </c:when>
-				            <c:otherwise>
-				            	<h3>
-				            	<form action="/" method="post">
-						                	<input type="hidden" name="movie_title" value="${movie_title}" />
-						                	<input type="hidden" name="title" value="${movie.title}" />
-						                	<input type="hidden" name="releaseDate" value="${movie.releaseDate}" />
-						                	<input type="hidden" name="imgUrl" value="${movie.imgUrl}" />
-						                	<input type="hidden" name="movieDBID" value="${movie.movieDBID}" />
-						                	<input type="hidden" name="subscribed" value="true" />
-				                			<button type="submit" value="Submit" class="btn btn-danger btn-lg" style="width:200px">Unsubscribe</button>
-										</form>
-				                </h3>
-				            </c:otherwise>
-				        </c:choose>
-			         </c:when>
-			         <c:otherwise>
-			         	<h3>
-			         	Already Released!
-		                </h3>
-			         </c:otherwise>
-			     </c:choose>
-	            </div>
-	        <c:if test="${loop.last or (loop.index + 1) % 3 == 0}"> 
-	        </div>
-	        <!-- /.end row -->
-	        </c:if>
-	        
-	</c:forEach>
+</div>
         
         <hr>
 
