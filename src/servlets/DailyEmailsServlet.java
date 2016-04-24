@@ -55,31 +55,15 @@ public class DailyEmailsServlet extends HttpServlet {
 			alerts = DatabaseHandler.getTodaysAlerts();
 			DatabaseHandler.deleteOldAlerts();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
 		// Initialize JavaMail objects.
-//    	writer.println("Hello from DailyEmails");
-//    	final String lighthousePassword = "W45ev5`J(#M4MT]2gjn>";
     	Properties props = new Properties();
-//    	props.put("mail.smtp.auth", "true");
-//    	props.put("mail.smtp.starttls.enable", "true");
-//    	props.put("mail.smtp.host", "smtp.gmail.com");
-//    	props.put("mail.smtp.port", "587");
     	Session session = Session.getDefaultInstance(props, null); 
-//    			new javax.mail.Authenticator() {
-//    				protected PasswordAuthentication getPasswordAuthentication() {
-//    					return new PasswordAuthentication(LIGHTHOUSE_EMAIL, lighthousePassword); 
-//    					} 
-//    				});
     	
     	// Iterate through alerts.
     	for (Alert alert : alerts) {  
-//    		System.out.println(alert.getTitle() + " " + alert.getReleaseDate());
-//    		for (String email : alert.getEmailAddresses()) {
-//    			System.out.println(email);
-//    		}
     		
     		// Prepare email message with a particular movie's title and release date.
     		try {

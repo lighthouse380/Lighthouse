@@ -61,7 +61,6 @@ public class DatabaseHandler {
 		 * Return:			A PreparedStatement for the query that can then be executed.			
 		 * */
 		
-//		log.warning("Hello from DatabaseHandler");
 		// Connect to a Lighthouse database and create a prepared statement with the given query.
     	PreparedStatement statement = null;
 	    try {
@@ -131,22 +130,6 @@ public class DatabaseHandler {
 		conn = null;
     }
     
-    private static String convertDate(Date javaDate) {
-		/* 
-		 * Method Name: 	convertDate()
-		 * Author:			Carrick Bartle
-		 * Date Created:	03-24-2016
-		 * Purpose:			Takes a java.util.Date and converts it to a string that can be parsed
-		 * 					as a DATE in MySQL.
-		 * Input: 			A java.util.Date.
-		 * Return:			A string with the given date in the form of "yyyy-MM-dd". 
-		 * */ 
- 
-    	// Set the date format and convert the input Date into that format.
-    	java.text.SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
-    	String mySQLdate = sdf.format(javaDate);
-    	return mySQLdate;
-    }
 	
 	public static void addSubscription(Movie movie, String userEmail) throws SQLException {	
 		/* 
@@ -161,7 +144,7 @@ public class DatabaseHandler {
 		 * */    
 		
 		// Convert the movie's release date into a MySQL-friendly string in the form of a date.
-    	String convertedDate = convertDate(movie.getReleaseDate());
+    	String convertedDate = Util.convertDate(movie.getReleaseDate());
     	
     	// Send a query to the database to add a subscription to a movie for the user. 
         PreparedStatement statement = getStatement("call sp_add_subscription(?, ?, ?, ?, ?);");
@@ -205,16 +188,16 @@ public class DatabaseHandler {
         return movies;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static ArrayList<Movie> getListofSubscriptions(String userEmail) throws SQLException {
 		/* 
 		 * Method Name: 	getListofSubscriptions()
 		 * Author:			Carrick Bartle
 		 * Date Created:	04-09-2016
-		 * Purpose:			Fetches all the movies a given user is subscribed to and returns them as a list sorted
-		 * 					by release date.
+		 * Purpose:			Fetches all the movies a given user is subscribed to in a particular order.
 		 * Input: 			A string containing the user's email address.
-		 * Return:			ArrayList of all the movies a given user is subscribed to, sorted by release date.
+		 * Return:			ArrayList of all the movies a given user is subscribed to first ordered chronologically 
+		 * 					for movies that have not been released yet, then in reverse chronological order for 
+		 * 					released movies.
 		 * */   
 		
 		// Query the database to retrieve all the movies the user is subscribed to. 
@@ -299,11 +282,8 @@ public class DatabaseHandler {
         		currTitle = rs.getString("title");
         		currDate = rs.getDate("releaseDate");
         		emailAddresses = new ArrayList<>();
-//        		System.out.println(currTitle);
-//        		System.out.println(currDate);
         	} 
         	emailAddresses.add(rs.getString("email"));
-//    		System.out.println(rs.getString("email"));
 		}
 		
 		// Reached the end of the results. Add the final alert.
@@ -330,13 +310,11 @@ public class DatabaseHandler {
 		
 		// Connect to database and execute query to get all the movies.
         PreparedStatement statement = getStatement("call sp_get_all_subscribed_movies()"); 
-//        log.warning("Hello from getAllMovies()");
         ResultSet rs = statement.executeQuery();
 		while (rs.next()) {
 			Movie newMovie = new Movie("", rs.getDate("releaseDate"), 
 									   "", String.valueOf(rs.getInt("movie_id"))); 
 			movies.add(newMovie);
-//			log.warning(newMovie.getMovieDBID());
 		}
 		conn.close();
 		conn = null;
@@ -355,7 +333,7 @@ public class DatabaseHandler {
 		 * */   
 		
 		// Convert the movie's release date into a MySQL-friendly string in the form of a date.
-    	String convertedDate = convertDate(movie.getReleaseDate());
+    	String convertedDate = Util.convertDate(movie.getReleaseDate());
     	
 		// Connect to database and execute query to update the movie's release date.
         PreparedStatement statement = getStatement("call sp_modify_release_date(?, ?)"); 
@@ -376,14 +354,14 @@ public class DatabaseHandler {
 		 * Return:			An ArrayList of email addresses of users subscribed to the movie.
 		 * */   
 		ArrayList<String> subscribers = new ArrayList<>();
-        PreparedStatement statement = getStatement("call sp_get_subscribers(?)");
+        PreparedStatement statement = getStatement("call sp_get_movie_subscribers(?)");
         statement.setString(1, movie.getMovieDBID()); 
         ResultSet rs = statement.executeQuery();
-		conn.close();
-		conn = null;
         while (rs.next()) {
         	subscribers.add(rs.getString("email"));
         }
+        conn.close();
+		conn = null;
 		return subscribers;
 	}
 	
@@ -402,28 +380,5 @@ public class DatabaseHandler {
 		conn.close();
 		conn = null;	
 	}
-	
-	
-//    public static boolean checkSubscription(Movie movie, String userEmail) throws SQLException{
-//    	boolean subscribed = false;
-////	    System.out.println("Java date:" + movie.getReleaseDate());
-//    	String convertedDate = convertDate(movie.getReleaseDate());
-////	   	System.out.println("MySQL date:" + convertedDate);
-//        PreparedStatement statement = getStatement("SELECT fn_check_subscription(?, ?, ?);");
-//        statement.setString(1, userEmail);
-//        statement.setString(2, movie.getTitle());
-//        statement.setString(3, convertedDate);
-//        ResultSet rs = statement.executeQuery();
-//        if (rs.next()) {
-//        	if (rs.getBoolean(1)) {
-//        		subscribed = true;
-//        		//System.out.println("Subscribed");
-//        	} else {
-//        		//System.out.println("Not subscribed");
-//        	}
-//	    } else {
-//	    	System.out.println("Subscription information not found.");
-//	    }
-//    	return subscribed;
-//    }
+
 }

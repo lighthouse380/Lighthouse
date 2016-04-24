@@ -32,4 +32,21 @@ public class Util {
         return formatter.parse(date);
     }
 
+    public static String convertDate(Date javaDate) {
+		/* 
+		 * Method Name: 	convertDate()
+		 * Author:			Carrick Bartle
+		 * Date Created:	03-24-2016
+		 * Purpose:			Takes a java.util.Date and converts it to a string that can be parsed
+		 * 					as a DATE in MySQL.
+		 * Input: 			A java.util.Date.
+		 * Return:			A string with the given date in the form of "yyyy-MM-dd". 
+		 * */ 
+ 
+    	// Set the date format and convert the input Date into that format.
+    	java.text.SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
+    	String mySQLdate = sdf.format(javaDate);
+    	return mySQLdate;
+    }
+    
 }
