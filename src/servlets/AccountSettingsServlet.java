@@ -88,13 +88,13 @@ public class AccountSettingsServlet extends HttpServlet {
 		String userEmail = user.getEmail();
 		
 		// if the user is not null or empty delete the user from DB
-//		try {
-//			if (userEmail != null || userEmail != ""){
-//				DatabaseHandler.deleteUser(userEmail);
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			if (userEmail != null || userEmail != ""){
+				DatabaseHandler.deleteUser(userEmail);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
 		resp.sendRedirect(userService.createLogoutURL("/"));
 	}

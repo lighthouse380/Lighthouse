@@ -69,13 +69,16 @@ public class SearchResultsServlet extends HttpServlet {
 		
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
-
+		String loginUrl = userService.createLoginURL("/");
+		String logoutUrl = userService.createLogoutURL("/");
 		
 		
 		ArrayList<Movie> searchResults = new ArrayList<Movie>();
 		String movieTitle = req.getParameter("movie_title");
 
 		req.setAttribute("user", user);
+		req.setAttribute("loginUrl", loginUrl);
+		req.setAttribute("logoutUrl", logoutUrl);
 
 			
 

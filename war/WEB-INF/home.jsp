@@ -22,9 +22,6 @@
 
     <title>Lighthouse</title>
 
-    <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Custom CSS -->
     <link href="css/3-col-portfolio.css" rel="stylesheet">
 
@@ -36,7 +33,7 @@
     <![endif]-->
     
     
-	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 	<script src="http://code.jquery.com/jquery.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
     
@@ -65,7 +62,7 @@
     	    type: form_method,
     	    data: form_data,
     	    success: function() {
-    	      setTimeout(function() { button.button('complete'); }, 500);
+    	      setTimeout(function() { button.button('complete'); }, 200);
     	      console.log('end of subscribe...\n');
     	    }
     	  });
@@ -93,8 +90,61 @@
     	        error: console.log("error")
     	      });
     	    });
+    	  
+    	    
+    	    
+    	    var activeSystemClass = $('.list-group-item.active');
+    	    //something is entered in search form
+    	    $('#system-search').keyup( function() {
+    	       var that = this;
+    	        // affect all table rows on in systems table
+    	        var tableBody = $('.table-list-search tbody');
+    	        var tableRowsClass = $('.table-list-search tbody tr');
+    	        $('.search-sf').remove();
+    	        tableRowsClass.each( function(i, val) {
+    	        
+    	            //Lower text for case insensitive
+    	            var rowText = $(val).text().toLowerCase();
+    	            var inputText = $(that).val().toLowerCase();
+    	            if(inputText != '')
+    	            {
+    	                $('.search-query-sf').remove();
+    	                tableBody.prepend('<tr class="search-query-sf"><td colspan="6"><strong>Searching for: "'
+    	                    + $(that).val()
+    	                    + '"</strong></td></tr>');
+    	            }
+    	            else
+    	            {
+    	                $('.search-query-sf').remove();
+    	            }
+
+    	            if( rowText.indexOf( inputText ) == -1 )
+    	            {
+    	                //hide rows
+    	                tableRowsClass.eq(i).hide();
+    	                
+    	            }
+    	            else
+    	            {
+    	                $('.search-sf').remove();
+    	                tableRowsClass.eq(i).show();
+    	            }
+    	        });
+    	        //all tr elements are hidden
+    	        if(tableRowsClass.children(':visible').length == 0)
+    	        {
+    	            tableBody.append('<tr class="search-sf"><td class="text-muted" colspan="6">No entries found.</td></tr>');
+    	        }
+    	    });
+    	    
     	  });
     </script>
+    
+    <style>
+	.navbar-brand {
+		font-size: 38px;
+	}
+	</style>
 
 </head>
 
@@ -149,19 +199,20 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Search Movies
-                	<h4>Subscribe to the movies you want to be reminded about before they're out!</h4>
-		            <div id="imaginary_container">
-							<div class="input-group stylish-input-group">
+                	<h4>Subscribe to the movies you want to be reminded about before they're out!<br>
+                		When you subscribe we'll send you an email reminder 1 Month, 1 Week, and 1 Day before the release.</h4>
+							<div class="row">
 			                	<form method="get" action="/searchresults" ajax="true">
-				                    <input type="text" class="form-control"  placeholder="Movie title" name="movie_title" id="movie_title" type="text" value="${movie_title}">
-				                    <span class="input-group-addon">
-				                        <button type="button" value="Submit">
-				                            <span class="glyphicon glyphicon-search"></span>
-				                        </button>  
-				                    </span>
+				                    <div class="input-group">
+					                    <input class="form-control" id="system-search" name="movie_title" placeholder="Movie title" type="text"  value="${movie_title}" required>
+					                    <span class="input-group-btn">
+					                        <button type="submit" class="btn btn-default" style="height:34">
+					                        	<i class="glyphicon glyphicon-search"></i>
+					                        </button>
+					                    </span>
+					                </div>
 			                    </form>
 			                </div>
-					  </div>
                 </h1>
             </div>
         </div>

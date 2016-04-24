@@ -15,7 +15,7 @@
 	 <cron>
 	    <url>/dailyemails</url>
 	    <description>Mail out each day's release date reminders</description>
-	    <schedule>every day 11:30</schedule>
+	    <schedule>every day 3:30</schedule>
        <timezone>America/Tijuana</timezone>
 	    <retry-parameters>
 	      <min-backoff-seconds>2.5</min-backoff-seconds>

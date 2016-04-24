@@ -114,7 +114,7 @@ public class LighthouseServlet extends HttpServlet {
 		//from client based on the movie they are unsubscribing/subscribing to
 		String movieTitle = req.getParameter("title");
 		String movieImg = req.getParameter("imgUrl");
-		String susbcribed = req.getParameter("subscribed");
+		String subscribed = req.getParameter("subscribed");
 		String movieDBID = req.getParameter("movieDBID");
 
 		Date movieDate = null;
@@ -123,6 +123,7 @@ public class LighthouseServlet extends HttpServlet {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+//		log.warning("From doPost: The movie's ID is: " + movieDBID);
 		Movie movie = new Movie(movieTitle, movieDate, movieImg, movieDBID);
 		
 		//Get the search entry to reload the page with the same search results
@@ -130,7 +131,7 @@ public class LighthouseServlet extends HttpServlet {
 		String searchTitle = req.getParameter("movie_title");
 
 		try {
-			if (susbcribed.equalsIgnoreCase("false")) {
+			if (subscribed.equalsIgnoreCase("false")) {
 				DatabaseHandler.addSubscription(movie, userEmail);
 			} else {
 				DatabaseHandler.deleteSubscription(movie, userEmail);

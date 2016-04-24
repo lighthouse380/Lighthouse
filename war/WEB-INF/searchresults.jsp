@@ -49,7 +49,7 @@
 									</form>
 								</c:when>
 								<c:otherwise>
-									    <a href="${loginUrl }" class="btn btn-success btn-lg movie" style="width:200px"> Subscribe </a>
+									    <a href="${loginUrl }" class="btn btn-success btn-lg" style="width:200px"> Subscribe </a>
 								</c:otherwise>
 							</c:choose>
 			                </h3>

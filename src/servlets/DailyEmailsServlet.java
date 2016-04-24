@@ -53,6 +53,7 @@ public class DailyEmailsServlet extends HttpServlet {
     	ArrayList<Alert> alerts = new ArrayList<>();
 		try {
 			alerts = DatabaseHandler.getTodaysAlerts();
+			DatabaseHandler.deleteOldAlerts();
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -97,7 +98,6 @@ public class DailyEmailsServlet extends HttpServlet {
 	        	writer.println(e.toString());   
 	    	}
     	}
-    	// TODO delete old alerts
     }
     	
 

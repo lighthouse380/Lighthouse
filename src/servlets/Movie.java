@@ -82,7 +82,7 @@ public class Movie {
             return false;
         
         Movie otherMovie = (Movie) obj;
-        if (!releaseDate.equals(otherMovie.getMovieDBID()))  // Check if the two movies have the same ID.
+        if (!movieDBID.equals(otherMovie.getMovieDBID()))  // Check if the two movies have the same ID.
             return false;
         return true;
     }
