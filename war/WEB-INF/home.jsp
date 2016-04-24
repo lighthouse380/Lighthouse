@@ -65,7 +65,7 @@
     	    type: form_method,
     	    data: form_data,
     	    success: function() {
-    	      button.button('complete');
+    	      setTimeout(function() { button.button('complete'); }, 500);
     	      console.log('end of subscribe...\n');
     	    }
     	  });

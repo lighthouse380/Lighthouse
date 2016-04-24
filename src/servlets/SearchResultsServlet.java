@@ -136,6 +136,7 @@ public class SearchResultsServlet extends HttpServlet {
 	            JsonArray movies = pages.getAsJsonArray("results");
 	            //Get user's subscriptions to see if they're subscribed to any of the search results
 	            HashSet<Movie> subscriptions = null;
+	            
 	            if (user != null){
             		subscriptions = DatabaseHandler.getSubscriptions(user.getEmail());
 	            }
