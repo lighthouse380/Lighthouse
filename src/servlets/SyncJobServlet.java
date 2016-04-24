@@ -1,7 +1,15 @@
+/* 
+ * Class: 			SyncJobServlet
+ * Author:			Carrick Bartle
+ * Date Created:	04-09-2016
+ * Purpose:			Scheduled every day to get the release dates for all subscribed movies from 
+ * 					The Movie DB to check for any updates and email subscribers any changes.
+ * 
+ * */
+
 package servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,7 +49,7 @@ public class SyncJobServlet extends HttpServlet {
 	static final String LIGHTHOUSE_NAME = "Lighthouse";
 	static final String EMAIL_SUBJECT = "Lighthouse Release Date Update";
 	static final String EMAIL_TEXT = " has changed its release date from ";
-	static final String TO = "to";
+	static final String TO = " to ";
     
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws MalformedURLException, IOException {
 		/* 
@@ -71,7 +79,9 @@ public class SyncJobServlet extends HttpServlet {
     	        if (element.isJsonObject()) {
     	            JsonObject pages = element.getAsJsonObject();
     	            String dateString = pages.get("release_date").getAsString();
-    	            log.warning("release date:" + dateString);
+    	            movie.setTitle(pages.get("title").getAsString());
+//    	            log.warning(pages.get("title").getAsString());
+//    	            log.warning("Database release date:" + movie.getReleaseDate());
 	                Date releaseDate = null;
 	                
 	                if (!dateString.isEmpty()) {
@@ -88,19 +98,20 @@ public class SyncJobServlet extends HttpServlet {
 						} 
 	                }
 	                if (releaseDate == null) {
-	                	log.warning("Something went wrong with the release date");
+	                	log.warning("Something went wrong with the release date.");
 	                } else {
-	                	log.warning(releaseDate.toString());
-	                }
-	                if (releaseDate != null && !releaseDate.equals(movie.getReleaseDate())) {
-	                	log.warning("The release date is different!");
-	                	movie.setReleaseDate(releaseDate);
-	                	try {
-							DatabaseHandler.updateReleaseDate(movie);
-							mailUpdate(movie, releaseDate);
-						} catch (SQLException e1) {
-							e1.printStackTrace();
-						}
+//	                	log.warning(releaseDate.toString());
+		                if (!releaseDate.equals(movie.getReleaseDate())) {
+		                	Date oldDate = movie.getReleaseDate();
+//		                	log.warning("The release date is different!");
+		                	movie.setReleaseDate(releaseDate);
+		                	try {
+								DatabaseHandler.updateReleaseDate(movie);
+								mailUpdate(movie, oldDate);
+							} catch (SQLException e1) {
+								e1.printStackTrace();
+							}
+		                }
     	            }
     	        }
     		}	
@@ -121,14 +132,19 @@ public class SyncJobServlet extends HttpServlet {
 		 * Return:			N/A			
 		 * */
     	ArrayList<String> subscribers = DatabaseHandler.getSubscribers(movie);
+    	log.warning(String.valueOf(subscribers.size()));
     	Properties props = new Properties();
     	Session session = Session.getDefaultInstance(props, null); 
     	for (String subscriber : subscribers) {
+    		log.warning(subscriber);
     		try {
 	    	    Message msg = new MimeMessage(session);
 	    	    msg.setFrom(new InternetAddress(LIGHTHOUSE_EMAIL, LIGHTHOUSE_NAME));
 	    	    msg.setSubject(EMAIL_SUBJECT);
-	    	    msg.setText(movie.getTitle() + EMAIL_TEXT + oldDate + TO + movie.getReleaseDate());
+	    	    log.warning("This should be the title: " + movie.getTitle());
+	    	    String oldDateStr = Util.convertDate(oldDate);
+	    	    String newDateStr = Util.convertDate(movie.getReleaseDate());
+	    	    msg.setText(movie.getTitle() + EMAIL_TEXT + oldDateStr + TO + newDateStr + ".");
 	    	    
 	    	    // Send the message to each subscriber to this movie.
 	    	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(subscriber));   
