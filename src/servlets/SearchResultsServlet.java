@@ -1,8 +1,9 @@
 /* 
- * Class: 			LighthouseServlet
+ * Class: 			SearchResultsServlet
  * Author:			Harout Grigoryan
- * Date Created:	03-14-2016
- * Purpose:			Handle GET and POST requests from home.jsp (homepage)
+ * Date Created:	04-19-2016
+ * Purpose:			Handle GET requests from "/searchresults"
+ * 					Works with searchresults.jsp
  * 					Query TheMovieDB based on search title
  * 
  * */

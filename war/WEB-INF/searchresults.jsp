@@ -1,7 +1,14 @@
+<!-- 
+ Name: 		    	searchresults.jsp
+ Author:			Harout Grigoryan
+ Date Created:  	04-19-2016
+ Purpose:			Generates html search results for the ajax call within home.jsp.
+ -->
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
+                                                                         
 <c:if test="${(not (empty movie_title)) and (empty searchResults)}">
 	<h2>No movies found :(</h2>
 	<p>

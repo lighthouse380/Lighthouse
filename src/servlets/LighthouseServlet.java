@@ -3,7 +3,6 @@
  * Author:			Harout Grigoryan
  * Date Created:	03-14-2016
  * Purpose:			Handle GET and POST requests from home.jsp (homepage)
- * 					Query TheMovieDB based on search title
  * 
  * */
 
@@ -107,7 +106,7 @@ public class LighthouseServlet extends HttpServlet {
 		 * 					then use DatabaseHandler to update the DB accordingly.
 		 * Input: 			HTTP request and response which include attributes
 		 * 					(such as the movie's information for subscribing)
-		 * Return:			method is void, redirects to the doGet	
+		 * Return:			method is void
 		 * */
 		
 		UserService userService = UserServiceFactory.getUserService();
