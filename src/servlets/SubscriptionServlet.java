@@ -4,7 +4,7 @@
  * Date Created:	04-13-2016
  * Purpose:			Handle GET and POST requests from servlet subscriptions.jsp
  * 					Query The database for subscribed movies
- * 
+ * 					Display page of current and expired subscriptions
  * */
 
 package servlets;
@@ -56,7 +56,10 @@ public class SubscriptionServlet extends HttpServlet {
 		 * Date Created:	04-14-2016
 		 * Purpose:			Loads attributes of subscriptions.jsp and sends the page to the browser. 
 		 * Input: 			HTTP request and response which include attributes 
-		 * Return:			method is void, but produces the jsp page.			
+		 * Return:			method is void, but produces the jsp page.
+		 *                              If the user is subscribed to a movie, image, name, release date data
+		 * 				are organized on the page in order from most recent subscriptions to latest.
+		 *				Expired subscriptions are organized in order of recent to past.
 		 * */
 		
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
@@ -114,7 +117,7 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 		
 		/* 
 		 * Method Name:		doPost()
-		 * Author:			Khajag Basmajian
+		 * Author:			Khajag Basmajian and Sevan Gregorian
 		 * Date Created:	04-14-2016
 		 * Purpose:			Take homepage's POST requests which is for unsubscribing 
 		 * 					from movies in the users subscriptions list.
@@ -175,7 +178,7 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 
 		/* 
 		 * Method Name:		getMovies()
-		 * Author:			Kahajag Basmajian
+		 * Author:			Kahajag Basmajian and Sevan Gregorian
 		 * Date Created:	04-14-2016
 		 * Purpose:			Add the movie image to every movie in the list given.
 		 * Input: 			ArrayList of movies.
@@ -210,6 +213,7 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 				} 
 				else
 				x.setImgUrl("https://placehold.it/200x300?text=Movie"); 
+				//sets to placeholder image if no movie image is provided
 			}
 		}
 
