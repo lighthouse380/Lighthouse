@@ -50,7 +50,7 @@ import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 
 
 @SuppressWarnings("serial")
-public class SearchResultsServlet extends HttpServlet {	
+public class SearchResultsServlet extends HttpServlet {
 	
 	private static final String THEMOVIEDB_BASE_URL = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=";
 	private static final String MOVIE_IMG_BASE_URL = "http://image.tmdb.org/t/p/w500/";

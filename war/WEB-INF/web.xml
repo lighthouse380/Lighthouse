@@ -65,6 +65,16 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/accountsettings</url-pattern>
 	</servlet-mapping>
 	
+	<!-- Mapping for SyncJob servlet -->
+	<servlet>
+		<servlet-name>SyncJob</servlet-name>
+		<servlet-class>servlets.SyncJobServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SyncJob</servlet-name>
+		<url-pattern>/syncjob</url-pattern>
+	</servlet-mapping>
+	
 	
     <!-- Prevents non-admin users from triggering reminder emails. -->
 	<security-constraint>
@@ -77,15 +87,6 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		</auth-constraint>
 	</security-constraint>
 
-	<!-- Mapping for SyncJob servlet -->
-	<servlet>
-		<servlet-name>SyncJob</servlet-name>
-		<servlet-class>servlets.SyncJobServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>SyncJob</servlet-name>
-		<url-pattern>/syncjob</url-pattern>
-	</servlet-mapping>
 	
     <!-- Prevents non-admin users from running the sync job. -->
 	<security-constraint>
@@ -97,5 +98,27 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
+
+    <!-- Prevents non-users from accessing Subscriptions. -->
+	<security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Subscriptions</web-resource-name>
+            <url-pattern>/subscriptions</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>*</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    <!-- Prevents non-users from accessing Account Settings. -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>AccountSettings</web-resource-name>
+            <url-pattern>/accountsettings</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>*</role-name>
+        </auth-constraint>
+    </security-constraint>
 
 </web-app>

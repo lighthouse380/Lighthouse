@@ -28,7 +28,7 @@ public class DatabaseHandler {
 
 	static final String USERNAME = "root";
 	static final String PASSWORD = "password";
-	static final String GOOGLE_URL = "jdbc:google:mysql://lighthouse-1243:lighthousedb1/LighthouseDB";
+	static final String GOOGLE_URL = "jdbc:google:mysql://lighthouse-1243:lighthousedb1/LighthouseDB?useUnicode=yes&characterEncoding=UTF-8";
 	static final String GOOGLE_CLASS = "com.mysql.jdbc.GoogleDriver";
 	static final String LOCAL_URL = "jdbc:mysql://localhost:3306/LighthouseDB";
 
