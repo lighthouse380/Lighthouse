@@ -54,7 +54,7 @@ public class AccountSettingsServlet extends HttpServlet {
 		/* 
 		 * Method Name:		doGet()
 		 * Author:			Khajag Basmajian
-		 * Date Created:	04-19-2016
+		 * Date Created:	04-17-2016
 		 * Purpose:			Loads attributes of settings.jsp and sends the page to the browser. 
 		 * Input: 			HTTP request and response which include attributes 
 		 * Return:			method is void, but produces the jsp page.			
@@ -97,7 +97,7 @@ public class AccountSettingsServlet extends HttpServlet {
 		/* 
 		 * Method Name:		doPost()
 		 * Author:			Khajag Basmajian 
-		 * Date Created:	04-19-2016
+		 * Date Created:	04-17-2016
 		 * Purpose:			Take homepage's POST requests which is deleting
 		 * 					the users account from the DB
 		 * Input: 			HTTP request and response which include attributes
