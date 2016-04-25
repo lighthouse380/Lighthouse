@@ -14,13 +14,9 @@
 <head>
 	
 	<script>
-	function ConfirmDelete()
+	function ConfirmDelete(e)
 	{
-	  var x = confirm("Are you sure?");
-	  if (x)
-		  return true;
-	  else
-		return false;
+	    if(!confirm('Are you sure?'))e.preventDefault();
 	}
 	</script>
 	
@@ -105,7 +101,7 @@
 			
 			<h3>
 			<form action="/accountsettings" method="post">
-				<button type="submit" Onclick="ConfirmDelete()" value="Submit" class="btn btn-danger btn-lg" style="width:200px">Delete Account</button>
+				<button type="submit" Onclick="ConfirmDelete(event)" value="Submit" class="btn btn-danger btn-lg" style="width:200px">Delete Account</button>
 			</form>
 			</h3>	
 			

@@ -108,7 +108,7 @@ public class SearchResultsServlet extends HttpServlet {
 		req.setAttribute("movie_title", movieTitle);
 		
 		resp.setContentType("text/html");
-		
+		req.setCharacterEncoding(CHAR_ENCODING);
 		RequestDispatcher jsp = req.getRequestDispatcher("/WEB-INF/searchresults.jsp");
 		jsp.forward(req, resp);
 	}
