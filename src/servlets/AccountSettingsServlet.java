@@ -51,6 +51,15 @@ public class AccountSettingsServlet extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException, ServletException {
 		
+		/* 
+		 * Method Name:		doGet()
+		 * Author:			Khajag Basmajian
+		 * Date Created:	04-17-2016
+		 * Purpose:			Loads attributes of settings.jsp and sends the page to the browser. 
+		 * Input: 			HTTP request and response which include attributes 
+		 * Return:			method is void, but produces the jsp page.			
+		 * */
+		
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
 
@@ -85,6 +94,17 @@ public class AccountSettingsServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		
+		/* 
+		 * Method Name:		doPost()
+		 * Author:			Khajag Basmajian 
+		 * Date Created:	04-17-2016
+		 * Purpose:			Take homepage's POST requests which is deleting
+		 * 					the users account from the DB
+		 * Input: 			HTTP request and response which include attributes
+		 * 					(such as the users email)
+		 * Return:			method is void, redirects to the doGet	
+		 * */
+		
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		String userEmail = user.getEmail();
@@ -98,6 +118,7 @@ public class AccountSettingsServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
+		// redirect back to home page because the user is now logged out
 		resp.sendRedirect(userService.createLogoutURL("/"));
 	}
 
