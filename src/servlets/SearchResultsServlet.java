@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import Utilities.DatabaseHandler;
 import Utilities.Movie;
 import Utilities.Util;
+import Utilities.SearchResults;
 
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -52,7 +53,7 @@ import com.google.gwt.thirdparty.guava.common.eventbus.Subscribe;
 @SuppressWarnings("serial")
 public class SearchResultsServlet extends HttpServlet {
 	
-	private static final String THEMOVIEDB_BASE_URL = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query=";
+	private static final String THEMOVIEDB_BASE_URL = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2";
 	private static final String MOVIE_IMG_BASE_URL = "http://image.tmdb.org/t/p/w500/";
 	private static final String PLACEHOLDER_IMG_URL = "https://placehold.it/200x300?text=Movie";
 	private static final String CHAR_ENCODING = "UTF-8";
@@ -78,14 +79,9 @@ public class SearchResultsServlet extends HttpServlet {
 		String logoutUrl = userService.createLogoutURL("/");
 		
 		
-		ArrayList<Movie> searchResults = new ArrayList<Movie>();
+		SearchResults searchResults = null;
 		String movieTitle = req.getParameter("movie_title");
-
-		req.setAttribute("user", user);
-		req.setAttribute("loginUrl", loginUrl);
-		req.setAttribute("logoutUrl", logoutUrl);
-
-			
+		int pageNum = Integer.parseInt(req.getParameter("pageNum"));
 
 		try {
 			DatabaseHandler.printUsers();
@@ -95,17 +91,23 @@ public class SearchResultsServlet extends HttpServlet {
 		
 	 	if (movieTitle != null && movieTitle != ""){		
 			try {
-				searchResults = this.getMovies(movieTitle, user);
+				searchResults = this.getMovies(movieTitle, pageNum, user);
 			} catch (ParseException | SQLException e) {
 				e.printStackTrace();
 			}
 			//decode so search bar shows correct string
 			movieTitle = java.net.URLDecoder.decode(movieTitle, CHAR_ENCODING);
 		}
+	 	
+	 	
+		req.setAttribute("user", user);
+		req.setAttribute("loginUrl", loginUrl);
+		req.setAttribute("logoutUrl", logoutUrl);
 		
-		req.setAttribute("searchResults", searchResults);
+		req.setAttribute("searchResults", searchResults.getMovieList());
 		req.setAttribute("currentTime", fmt.format(new Date()));
 		req.setAttribute("movie_title", movieTitle);
+		req.setAttribute("pageAvailable", searchResults.getPageAvailable().toString());
 		
 		resp.setContentType("text/html");
 		req.setCharacterEncoding(CHAR_ENCODING);
@@ -114,7 +116,7 @@ public class SearchResultsServlet extends HttpServlet {
 	}
 	
 	
-	 private ArrayList<Movie> getMovies(String title, User user) throws MalformedURLException, IOException, ParseException, SQLException{
+	 private SearchResults getMovies(String title, int pageNum, User user) throws MalformedURLException, IOException, ParseException, SQLException{
 			
 		 	/* 
 			 * Method Name:		getMovies()
@@ -131,17 +133,20 @@ public class SearchResultsServlet extends HttpServlet {
 			//encode movie title for API call
 	 		title = java.net.URLEncoder.encode(title, CHAR_ENCODING);
 	 		
-		 	//Base URL for TheMovieDB API's movie search, append title to this
-	    	String url = THEMOVIEDB_BASE_URL + title;
+		 	//Base URL for TheMovieDB API's movie search, append title and page number to this
+	    	String url = THEMOVIEDB_BASE_URL + "&query=" + title + "&page=" + pageNum;
 	        String json = IOUtils.toString(new URL(url));
+	        int totalPages = 0;
 	        JsonParser parser = new JsonParser();
 
 	        //Element is the root node of the parsed JSON
 	        //Using element we can access the keys/values in the JSON
 	        JsonElement element = parser.parse(json);
 	        if (element.isJsonObject()) {
-	            JsonObject pages = element.getAsJsonObject();
-	            JsonArray movies = pages.getAsJsonArray("results");
+	            JsonObject page = element.getAsJsonObject();
+	            JsonArray movies = page.getAsJsonArray("results");
+	            totalPages = page.get("total_pages").getAsInt();
+	            
 	            //Get user's subscriptions to see if they're subscribed to any of the search results
 	            HashSet<Movie> subscriptions = null;
 	            
@@ -180,7 +185,11 @@ public class SearchResultsServlet extends HttpServlet {
 	            }
 	        } 
 	        
-	        return movieList;
+
+	        
+	        SearchResults movieResults = new SearchResults(movieList, (pageNum < totalPages));
+	        
+	        return movieResults;
 	    }
 	    
 	    

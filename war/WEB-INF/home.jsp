@@ -38,14 +38,6 @@
 	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
     
     <script type="text/javascript">
-    function validateForm() {
-    	  var x = document.forms["search-form"]["movie_title"].value;
-    	  if (x == null || x == "") {
-    	    alert("Please enter a movie title!");
-    	    return false;
-    	  }
-    	}
-
     	var movieFunc = function(e) {
     	  e.preventDefault();
     	  var button = $(this);
@@ -56,27 +48,25 @@
     	    return false;
     	  }
 
-    	  console.log(button);
     	  $.ajax({
-    	    url: "/",
+    	    url: "/searchresults",
     	    type: form_method,
     	    data: form_data,
     	    success: function() {
     	      setTimeout(function() { button.button('complete'); }, 200);
-    	      console.log('end of subscribe...\n');
     	    }
     	  });
     	};
 
     	  $(document).ready(function() {
-
+			var search_form_data;
     	    $("form[ajax=true]").submit(function(e) {
     	      e.preventDefault();
     	      var form_data = $(this).serialize();
+    	      search_form_data = form_data;
     	      var form_url = $(this).attr("action");
     	      var form_method = $(this).attr("method").toUpperCase();
 
-    	      console.log("search starting\n");
     	      $.ajax({
     	        type: form_method,
     	        url: form_url,
@@ -85,11 +75,38 @@
     	        success: function(results) {
     	          $("#searchResults").html(results);
     	          $(".movie").click(movieFunc);
+    	          
     	          return false;
     	        },
     	        error: console.log("error")
     	      });
     	    });
+    	    
+    	    
+    	 // Each time the user scrolls
+    	 var win = $(window);
+    	 var pageAvailable = false;
+    	 var pageNum = 0;
+    	 
+    		win.scroll(function(e) {
+    			// End of the document reached?
+    			if (($(document).height() - win.height() == win.scrollTop()) && pageAvailable) {
+    				$('#loading').show();
+
+    				$.ajax({
+    	    	        type: form_method,
+    	    	        url: form_url,
+    	    	        data: {search_form_data + pageNum},
+    	    	        dataType: "html",
+    	    	        success: function(results) {
+    	    	          $("#searchResults").append(results);
+    	    	          $(".movie").click(movieFunc);
+    	    	          return false;
+    	    	        },
+    	    	        error: console.log("error")
+    	    	      });
+    			}
+    		});
     	  
     	    
     	    
@@ -139,10 +156,16 @@
     	    
     	  });
     </script>
-    
     <style>
 	.navbar-brand {
 		font-size: 38px;
+	}
+	
+		
+	img#loadingimg {
+	    border: none;
+	    display: none;
+	    margin: 0 auto;
 	}
 	</style>
 
@@ -220,7 +243,7 @@
 <div id="searchResults">
 
 </div>
-        
+        <div><img id="loadingimg" src="img/loading.gif"/></div>
         <hr>
 
         <!-- Footer -->

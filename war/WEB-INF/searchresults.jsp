@@ -9,7 +9,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
                                                                          
-<c:if test="${(not (empty movie_title)) and (empty searchResults)}">
+<c:if test="${(not (empty movie_title)) and (numPages == 0)}">
 	<h2>No movies found :(</h2>
 	<p>
 		Try checking your spelling.

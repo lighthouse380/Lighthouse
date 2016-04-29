@@ -12,5 +12,6 @@
 	<classpathentry exported="true" kind="lib" path="war/WEB-INF/lib/javax.mail.jar"/>
 	<classpathentry exported="true" kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/sqladmin-v1beta4r20lv1.18.0-rc"/>
 	<classpathentry exported="true" kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/sqladmin-v1beta4r22lv1.21.0"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
