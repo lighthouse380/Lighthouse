@@ -6,7 +6,7 @@
  * 					for processing.
  * 
  * */
-package Utilities;
+package utilities;
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -71,27 +71,6 @@ public class DatabaseHandler {
 			e.printStackTrace();
 		}
 	    return statement;
-	}
-    
-	public static void printUsers() throws SQLException {
-		/* 
-		 * Method Name:		printUsers()
-		 * Author:			Carrick Bartle
-		 * Date Created:	03-24-2016
-		 * Purpose:			Prints all the users in the User table of the Lighthouse database.
-		 * Input: 			N/A
-		 * Return:			N/A			
-		 * */
-		
-		// Get all the users in the database.
-		PreparedStatement ps = getStatement("SELECT * from User;");  
-		ResultSet rs = ps.executeQuery();
-		while (rs.next()) {   
-			// Iterate through each row of the results to print each user's email address and database ID. 
-			System.out.println(rs.getString("email") + " " + rs.getString("user_id"));
-		}
-		conn.close();
-		conn = null;
 	}
     
     public static void addUser(String userEmail) throws SQLException  {	 

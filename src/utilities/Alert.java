@@ -5,7 +5,7 @@
  * Purpose:			Holds data pertaining to alerts (subscribers' email addresses, title, release date).
  * 
  * */
-package Utilities;
+package utilities;
 
 import java.util.ArrayList;
 import java.util.Date;

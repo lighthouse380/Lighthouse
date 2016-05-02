@@ -28,14 +28,14 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
+import utilities.DatabaseHandler;
+import utilities.Movie;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import Utilities.DatabaseHandler;
-import Utilities.Movie;
 
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -65,29 +65,29 @@ public class SubscriptionServlet extends HttpServlet {
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
 
+		//Get the currently logged in user with Google's User API
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
+		
+		//Generate the URL that directs the user to Google's Sign in/out page
+		//it will redirect with authentication to the root url "/" after user signs in/out
 		String loginUrl = userService.createLoginURL("/");
 		String logoutUrl = userService.createLogoutURL("/");
 
-
 		ArrayList<Movie> subscribedMovies = new ArrayList<Movie>();
 		
+		// set attributes for subscriptions.jsp
 		req.setAttribute("user", user);
 		req.setAttribute("loginUrl", loginUrl);
 		req.setAttribute("logoutUrl", logoutUrl);
 
+		//Add user's email to Database (unless it exists already)
 		if (user != null) {
 			try {
 				DatabaseHandler.addUser(user.getEmail());
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}				
-		}
-		try {
-			DatabaseHandler.printUsers();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
 		}
 		
 		// Load the users subscribed movies from DB. 
@@ -102,7 +102,7 @@ public class SubscriptionServlet extends HttpServlet {
 
 		}
 
-		
+		// set attributes for subscriptions.jsp		
 		req.setAttribute("subscribedMovies", subscribedMovies);
 		req.setAttribute("currentTime", fmt.format(new Date()));
 
@@ -136,6 +136,7 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 		String movieImg = req.getParameter("imgUrl");
 		String susbcribed = req.getParameter("subscribed");
 		Date movieDate = null;
+		// try to parse the movie date into correct format
 		try {
 			movieDate = this.parseDate(req.getParameter("releaseDate"), "yyyy-MM-dd");
 		} catch (ParseException e) {
@@ -145,6 +146,8 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 		// Get the list of subscribed movies
 		ArrayList<Movie> subscribedMovies = new ArrayList<Movie>();
 		Movie x = null;
+		// call getMovieImg to get all the images for the list of subscriptions
+		// becuase they are not stored in the DB
 		try {
 			subscribedMovies = this.getMovieImg(DatabaseHandler.getListofSubscriptions(user.getEmail()));
 		} catch (ParseException | SQLException e) {
@@ -190,6 +193,7 @@ public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOEx
 			//encode movie title for API call
 	 		String movieTitle = java.net.URLEncoder.encode(movieList.get(i).getTitle(), "UTF-8");
 	 		
+	 		// api url to use for making calls to api
 			String url = "http://api.themoviedb.org/3/search/movie?api_key=59471fd0915a80b420b392a5db81f1c2&query="
 					+ movieTitle;
 			String json = IOUtils.toString(new URL(url));

@@ -5,7 +5,7 @@
  * Purpose:			Holds information about a movie and enables a user to subscribe to and unsubscribe from it.
  * 
  * */
-package Utilities;
+package utilities;
 
 import java.sql.SQLException;
 import java.util.Date;

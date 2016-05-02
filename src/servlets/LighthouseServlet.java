@@ -27,15 +27,15 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
+import utilities.DatabaseHandler;
+import utilities.Movie;
+import utilities.Util;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import Utilities.DatabaseHandler;
-import Utilities.Movie;
-import Utilities.Util;
 
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -67,16 +67,16 @@ public class LighthouseServlet extends HttpServlet {
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
 		
+		//Get the currently logged in user with Google's User API
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
+		
+		//Generate the URL that directs the user to Google's Sign in/out page
+		//it will redirect with authentication to the root url "/" after user signs in/out
 		String loginUrl = userService.createLoginURL("/");
 		String logoutUrl = userService.createLogoutURL("/");
-		
 
-		req.setAttribute("user", user);
-		req.setAttribute("loginUrl", loginUrl);
-		req.setAttribute("logoutUrl", logoutUrl);
-			
+		//Add user's email to Database (unless it exists already)
 		if (user != null) {
 			try {
 				DatabaseHandler.addUser(user.getEmail());
@@ -84,14 +84,15 @@ public class LighthouseServlet extends HttpServlet {
 				e.printStackTrace();
 			}				
 		}
-		try {
-			DatabaseHandler.printUsers();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
+		
+	 	//set values for attributes that will be used in home.jsp
+		req.setAttribute("user", user);
+		req.setAttribute("loginUrl", loginUrl);
+		req.setAttribute("logoutUrl", logoutUrl);
 		
 		resp.setContentType("text/html");
 		
+		//forward data and dispatch the JSP
 		RequestDispatcher jsp = req.getRequestDispatcher("/WEB-INF/home.jsp");
 		jsp.forward(req, resp);
 	}

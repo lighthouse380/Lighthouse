@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import Utilities.Alert;
-import Utilities.DatabaseHandler;
+import utilities.Alert;
+import utilities.DatabaseHandler;
 
 import java.util.ArrayList;
 

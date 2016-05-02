@@ -32,9 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 
-import Utilities.DatabaseHandler;
-import Utilities.Movie;
-import Utilities.Util;
+import utilities.DatabaseHandler;
+import utilities.Movie;
+import utilities.Util;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -128,8 +128,6 @@ public class SyncJobServlet extends HttpServlet {
     	}
     	
     }
-    
-    
     
     void mailUpdate(Movie movie, Date oldDate) throws SQLException {
 		/* 

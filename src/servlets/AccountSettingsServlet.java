@@ -29,13 +29,13 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
+import utilities.DatabaseHandler;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import Utilities.DatabaseHandler;
 
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -63,8 +63,12 @@ public class AccountSettingsServlet extends HttpServlet {
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
 
+		//Get the currently logged in user with Google's User API
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
+		
+		//Generate the URL that directs the user to Google's Sign in page
+		//it will redirect with authentication to the root url "/" after user signs in
 		String loginUrl = userService.createLoginURL("/");
 		String logoutUrl = userService.createLogoutURL("/");
 
@@ -72,17 +76,13 @@ public class AccountSettingsServlet extends HttpServlet {
 		req.setAttribute("loginUrl", loginUrl);
 		req.setAttribute("logoutUrl", logoutUrl);
 
+		// if the user is not null, add the user to the database
 		if (user != null) {
 			try {
 				DatabaseHandler.addUser(user.getEmail());
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}				
-		}
-		try {
-			DatabaseHandler.printUsers();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
 		}
 
 		resp.setContentType("text/html");
@@ -105,6 +105,7 @@ public class AccountSettingsServlet extends HttpServlet {
 		 * Return:			method is void, redirects to the doGet	
 		 * */
 		
+		// Get the current users information from userservice
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		String userEmail = user.getEmail();

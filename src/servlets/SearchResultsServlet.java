@@ -29,15 +29,15 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
+import utilities.DatabaseHandler;
+import utilities.Movie;
+import utilities.Util;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import Utilities.DatabaseHandler;
-import Utilities.Movie;
-import Utilities.Util;
 
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -72,27 +72,23 @@ public class SearchResultsServlet extends HttpServlet {
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 		fmt.setTimeZone(new SimpleTimeZone(0, ""));
 		
+		
+		//Get the currently logged in user with Google's User API
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
+		
+		//Generate the URL that directs the user to Google's Sign in page
+		//it will redirect with authentication to the root url "/" after user signs in
 		String loginUrl = userService.createLoginURL("/");
-		String logoutUrl = userService.createLogoutURL("/");
 		
 		
 		ArrayList<Movie> searchResults = new ArrayList<Movie>();
-		String movieTitle = req.getParameter("movie_title");
-
-		req.setAttribute("user", user);
-		req.setAttribute("loginUrl", loginUrl);
-		req.setAttribute("logoutUrl", logoutUrl);
-
-			
-
-		try {
-			DatabaseHandler.printUsers();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
 		
+		//Get the text that the user entered in the search field.
+		String movieTitle = req.getParameter("movie_title");
+	
+		//if user entered a movie title, get movie results for the title
+		//otherwise return no results
 	 	if (movieTitle != null && movieTitle != ""){		
 			try {
 				searchResults = this.getMovies(movieTitle, user);
@@ -103,13 +99,17 @@ public class SearchResultsServlet extends HttpServlet {
 			movieTitle = java.net.URLDecoder.decode(movieTitle, CHAR_ENCODING);
 		}
 		
+	 	//set values for attributes that will be used in searchresults.jsp
+		req.setAttribute("user", user);
+		req.setAttribute("loginUrl", loginUrl);
 		req.setAttribute("searchResults", searchResults);
 		req.setAttribute("currentTime", fmt.format(new Date()));
 		req.setAttribute("movie_title", movieTitle);
 		
 		resp.setContentType("text/html");
-		req.setCharacterEncoding(CHAR_ENCODING);
-		RequestDispatcher jsp = req.getRequestDispatcher("/WEB-INF/searchresults.jsp");
+		
+		//forward data and dispatch the JSP
+		RequestDispatcher jsp = req.getRequestDispatcher("/WEB-INF/searchresults.jsp");		
 		jsp.forward(req, resp);
 	}
 	
@@ -146,6 +146,9 @@ public class SearchResultsServlet extends HttpServlet {
 	            HashSet<Movie> subscriptions = null;
 	            
 	            if (user != null){
+	            	//Get the current user's subscriptions from the database.
+	            	//Use these to determine if the user is subscribed to any of the movies
+	            	//that are in the search results
             		subscriptions = DatabaseHandler.getSubscriptions(user.getEmail());
 	            }
 	            for (int i = 0; i < movies.size(); i++) {
@@ -175,7 +178,8 @@ public class SearchResultsServlet extends HttpServlet {
 	                } else {
 	                	movie.setSubscribed(false);
 	                }
-
+	                
+	                //Add movie object to the list of movie's for search results
 	                movieList.add(movie);
 	            }
 	        } 
